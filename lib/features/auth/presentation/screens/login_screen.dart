@@ -186,7 +186,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             enabled: !isLoading,
             style: AppTypography.textTheme.bodyLarge,
             decoration: InputDecoration(
-              hintText: 'mor_2314',
+              hintText: 'johnd',
               hintStyle: AppTypography.textTheme.bodyLarge?.copyWith(
                 color: AppColors.textSecondary.withValues(alpha: 0.5),
               ),
@@ -256,7 +256,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             obscureText: !_isPasswordVisible,
             style: AppTypography.textTheme.bodyLarge,
             decoration: InputDecoration(
-              hintText: '••••••••',
+              hintText: '******',
               hintStyle: AppTypography.textTheme.bodyLarge?.copyWith(
                 color: AppColors.textSecondary.withValues(alpha: 0.5),
               ),

@@ -1,4 +1,5 @@
 # Product Requirements Document
+
 ## Expense Tracker Mobile App
 
 ---
@@ -16,16 +17,19 @@
 ## 2. Features
 
 ### 2.1 Authentication
+
 - Login dengan username & password
 - Tampilkan data user setelah login
 - Logout (clear state)
 
 **API Endpoints:**
+
 - `POST /auth/login` - Login
 - `GET /users/{id}` - Get user data
 - `DELETE /users/{id}` - Logout simulation
 
 ### 2.2 Expense Management
+
 - Lihat daftar expense/income
 - Tambah expense/income baru
 - Edit expense/income
@@ -39,6 +43,7 @@
 ## 3. Screens
 
 ### Screen 1: Login
+
 - Username field
 - Password field
 - Login button
@@ -46,6 +51,7 @@
 - Error message display
 
 ### Screen 2: Expense List
+
 - User info di header
 - Balance summary (Total Income, Total Expense, Balance)
 - List expenses
@@ -53,6 +59,7 @@
 - Logout button
 
 ### Screen 3: Expense Form
+
 - Title field
 - Amount field
 - Type selector (Income/Expense)
@@ -64,6 +71,7 @@
 ## 4. Data Models
 
 ### User
+
 ```dart
 - id: int
 - username: string
@@ -72,6 +80,7 @@
 ```
 
 ### Expense
+
 ```dart
 - id: string
 - title: string
@@ -96,6 +105,7 @@
 ---
 
 ## 6. Folder Structure (Clean Architecture)
+
 ```
 lib/
 ├── main.dart                           # App entry point with ProviderScope
@@ -179,6 +189,7 @@ lib/
 ```
 
 **Architecture Principles:**
+
 - **Clean Architecture** per feature: data → domain → presentation layers
 - **Feature-first organization**: Each feature is self-contained module
 - **Dependency Rule**: Presentation depends on Domain, Domain is independent
@@ -191,6 +202,7 @@ lib/
 ## 7. Technical Requirements
 
 ### Must Have
+
 - Riverpod untuk state management
 - HTTP client untuk API calls
 - Form validation
@@ -206,6 +218,7 @@ lib/
 ## 8. User Flows
 
 ### Login Flow
+
 ```
 1. Input username & password
 2. Tap login → Show loading
@@ -215,6 +228,7 @@ lib/
 ```
 
 ### Add Expense Flow
+
 ```
 1. Tap FAB di Expense List
 2. Form screen slides up
@@ -225,6 +239,7 @@ lib/
 ```
 
 ### Delete Flow
+
 ```
 1. Swipe expense card
 2. Show confirmation dialog
@@ -237,6 +252,7 @@ lib/
 ## 9. Acceptance Criteria
 
 **Functional:**
+
 - ✓ Login dengan API berhasil
 - ✓ Display user data
 - ✓ CRUD expense (Create, Read, Update, Delete)
@@ -244,6 +260,7 @@ lib/
 - ✓ Logout clear state
 
 **Technical:**
+
 - ✓ 3 screens implemented
 - ✓ 3 API endpoints hit (POST, GET, DELETE)
 - ✓ Riverpod digunakan
@@ -255,29 +272,36 @@ lib/
 ---
 
 ## 10. README.md Structure
+
 ```markdown
 # Expense Tracker App
 
 ## Fitur
+
 - Login/Logout
 - Manage Expenses & Income
 - Balance Summary
 
 ## Tech Stack
+
 - Flutter
 - Riverpod
 - FakeStore API
 
 ## Folder Structure
+
 [Penjelasan folder]
 
 ## How to Run
+
 [Setup steps]
 
 ## API Endpoints
+
 [List endpoints used]
 
 ## Limitations
+
 - Data in-memory only
 - FakeStore API constraints
 ```
@@ -285,9 +309,10 @@ lib/
 ---
 
 ## 11. Test Credentials
+
 ```
-Username: mor_2314
-Password: 83r5^_
+Username: johnd
+Password: m38rmF$
 ```
 
 ---

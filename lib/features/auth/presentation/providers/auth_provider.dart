@@ -1,4 +1,9 @@
-import 'package:cash_vit/features/auth/data/repository/auth_repository.dart';
+import 'package:cash_vit/core/services/api_services.dart';
+import 'package:cash_vit/features/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:cash_vit/features/auth/data/repository/auth_repository_impl.dart';
+import 'package:cash_vit/features/auth/domain/repositories/auth_repository.dart';
+import 'package:cash_vit/features/auth/domain/usecases/login_usecase.dart';
+import 'package:cash_vit/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_provider.g.dart';
@@ -38,10 +43,32 @@ class AuthError extends AuthState {
   const AuthError(this.message);
 }
 
-/// Auth repository provider (dependency injection)
+// ==================== Dependency Injection ====================
+
+/// Remote datasource provider
+@riverpod
+AuthRemoteDatasource authRemoteDatasource(Ref ref) {
+  return AuthRemoteDatasourceImpl(apiRequest: ApiRequest());
+}
+
+/// Auth repository provider (implements domain interface)
 @riverpod
 AuthRepository authRepository(Ref ref) {
-  return AuthRepository();
+  return AuthRepositoryImpl(
+    remoteDatasource: ref.watch(authRemoteDatasourceProvider),
+  );
+}
+
+/// Login use case provider
+@riverpod
+LoginUseCase loginUseCase(Ref ref) {
+  return LoginUseCase(ref.watch(authRepositoryProvider));
+}
+
+/// Logout use case provider
+@riverpod
+LogoutUseCase logoutUseCase(Ref ref) {
+  return LogoutUseCase(ref.watch(authRepositoryProvider));
 }
 
 /// Auth notifier managing authentication state
@@ -50,38 +77,30 @@ AuthRepository authRepository(Ref ref) {
 class AuthNotifier extends _$AuthNotifier {
   @override
   AuthState build() {
-    // Check saved auth status on init (future implementation)
-    // For now, start as unauthenticated
-    return const AuthUnauthenticated();
+    // Check saved auth status on initialization
+    _checkSavedAuth();
+    return const AuthInitial();
   }
 
   /// Login with username and password
+  /// Uses [LoginUseCase] which includes validation
   Future<void> login({
     required String username,
     required String password,
   }) async {
-    // Validation
-    if (username.isEmpty || password.isEmpty) {
-      state = const AuthError('Username and password cannot be empty');
-      _autoResetError();
-      return;
-    }
-
     // Set loading state
     state = const AuthLoading();
 
     try {
-      // Get repository from provider
-      final repository = ref.read(authRepositoryProvider);
-
-      // Call API
-      final token = await repository.login(
+      // Get use case and execute
+      final useCase = ref.read(loginUseCaseProvider);
+      final authEntity = await useCase(
         username: username,
         password: password,
       );
 
       // Success - update to authenticated state
-      state = AuthAuthenticated(token);
+      state = AuthAuthenticated(authEntity.token);
     } catch (e) {
       // Error - update to error state
       state = AuthError(e.toString().replaceFirst('Exception: ', ''));
@@ -90,17 +109,32 @@ class AuthNotifier extends _$AuthNotifier {
   }
 
   /// Logout user
+  /// Uses [LogoutUseCase]
   Future<void> logout() async {
     state = const AuthLoading();
 
     try {
-      final repository = ref.read(authRepositoryProvider);
-      await repository.logout();
+      // Get use case and execute
+      final useCase = ref.read(logoutUseCaseProvider);
+      await useCase();
 
       // Success - back to unauthenticated
       state = const AuthUnauthenticated();
     } catch (e) {
       // Even on error, logout locally
+      state = const AuthUnauthenticated();
+    }
+  }
+
+  /// Check if user has saved authentication
+  /// Called on app startup
+  Future<void> _checkSavedAuth() async {
+    final repository = ref.read(authRepositoryProvider);
+    final auth = await repository.getCurrentAuth();
+
+    if (auth != null) {
+      state = AuthAuthenticated(auth.token);
+    } else {
       state = const AuthUnauthenticated();
     }
   }
