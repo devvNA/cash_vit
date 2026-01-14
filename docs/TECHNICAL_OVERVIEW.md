@@ -17,52 +17,56 @@ This document provides a comprehensive technical overview of a production-ready 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                        USER INTERFACE                        │
-│  (login_screen.dart, home_screen.dart, main.dart/AuthGate) │
+│       features/*/presentation/screens/*_screen.dart          │
+│  (login_screen.dart, home_dashboard_screen.dart, etc.)      │
 └────────────────────┬────────────────────────────────────────┘
                      │ ref.watch() / ref.read() / ref.listen()
                      ↓
 ┌─────────────────────────────────────────────────────────────┐
 │                    STATE MANAGEMENT LAYER                    │
-│              (auth_provider.dart - Riverpod)                │
+│         features/*/presentation/providers/*_provider.dart    │
 │  ┌──────────────────────────────────────────────────────┐  │
-│  │ authNotifierProvider: StateNotifierProvider          │  │
-│  │   - Exposes: AuthState (sealed class)                │  │
-│  │   - Manages: Authentication state & business logic   │  │
+│  │ @riverpod Notifier with sealed class states          │  │
+│  │   - Exposes: AuthState, SplashState (sealed classes) │  │
+│  │   - Manages: Feature state & business logic          │  │
 │  └──────────────────────────────────────────────────────┘  │
 └────────────────────┬────────────────────────────────────────┘
                      │ Method calls
                      ↓
 ┌─────────────────────────────────────────────────────────────┐
 │                     REPOSITORY LAYER                         │
-│                  (auth_repository.dart)                      │
-│  - Handles API communication                                 │
-│  - Implements business logic                                 │
-│  - Returns Domain Models (User)                              │
+│            features/*/data/repository/*_repository.dart      │
+│  - Handles API communication via core/services/api_services │
+│  - Implements data transformation                            │
+│  - Returns domain models or primitives                       │
 └────────────────────┬────────────────────────────────────────┘
-                     │ HTTP/API calls
+                     │ HTTP/API calls (Dio)
                      ↓
 ┌─────────────────────────────────────────────────────────────┐
 │                      EXTERNAL API                            │
-│              (Backend Authentication Service)                │
+│              FakeStore API (fakestoreapi.com)               │
 └─────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────┐
 │                      DATA MODELS LAYER                       │
-│              (user.dart, auth_state.dart)                    │
-│  - Immutable data structures                                 │
+│              features/*/data/models/*_model.dart             │
+│  - Immutable data structures (User, Expense)                 │
 │  - Type-safe state representations                           │
-│  - JSON serialization support                                │
+│  - JSON serialization (fromJson/toJson)                      │
+│  - copyWith for immutable updates                            │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ### Layer Responsibilities
 
-| Layer | Files | Primary Responsibility | Key Concepts |
-|-------|-------|----------------------|--------------|
-| **Models** | `user.dart`, `auth_state.dart` | Define data structures | Immutability, Sealed Classes, Type Safety |
-| **Repository** | `auth_repository.dart` | External communication & business logic | API abstraction, Error handling |
-| **Provider** | `auth_provider.dart` | State management & coordination | Reactive state, Provider pattern |
-| **UI** | `login_screen.dart`, `home_screen.dart`, `main.dart` | User interaction & presentation | ConsumerWidget, Reactive UI |
+| Layer | Location | Primary Responsibility | Key Concepts |
+|-------|----------|----------------------|--------------|
+| **Models** | `features/*/data/models/` | Define data structures | Immutability, Sealed Classes, Type Safety |
+| **Repository** | `features/*/data/repository/` | External communication & data transformation | API abstraction, Error handling |
+| **Provider** | `features/*/presentation/providers/` | State management & coordination | @riverpod Notifier, Sealed states |
+| **UI** | `features/*/presentation/screens/` | User interaction & presentation | ConsumerWidget, Reactive UI |
+| **Core** | `core/services/`, `core/themes/` | Shared infrastructure | API client, Design system |
+| **Shared** | `shared/widgets/`, `shared/extensions/` | Cross-feature reusables | Common widgets, Dart extensions |
 
 ---
 
@@ -70,7 +74,7 @@ This document provides a comprehensive technical overview of a production-ready 
 
 ### 1. Data Models Layer
 
-#### 1.1 User Model (`models/user.dart`)
+#### 1.1 User Model (`features/profile/data/models/user_model.dart`)
 
 **Purpose**: Represents authenticated user data throughout the application.
 
@@ -103,7 +107,7 @@ class User {
 
 **Why Immutability**: Prevents accidental state mutations, enables time-travel debugging, makes state changes predictable and traceable.
 
-#### 1.2 Authentication State (`models/auth_state.dart`)
+#### 1.2 Authentication State (in `features/auth/presentation/providers/auth_provider.dart`)
 
 **Purpose**: Type-safe representation of all possible authentication states.
 
@@ -161,7 +165,7 @@ AuthUnauthenticated
 
 ### 2. Repository Layer
 
-#### AuthRepository (`repositories/auth_repository.dart`)
+#### AuthRepository (`features/auth/data/repository/auth_repository.dart`)
 
 **Purpose**: Abstraction layer for all authentication-related external operations.
 
@@ -223,7 +227,7 @@ Future<User> login({required String email, required String password}) async {
 
 ### 3. Provider Layer (State Management Core)
 
-#### Auth Provider (`providers/auth_provider.dart`)
+#### Auth Provider (`features/auth/presentation/providers/auth_provider.dart`)
 
 **Purpose**: Central state management hub for authentication flow.
 
@@ -388,7 +392,7 @@ getCurrentUser() completes
     └─→ state = AuthUnauthenticated → AuthGate renders LoginScreen
 ```
 
-#### 4.2 Login Screen (`screens/login_screen.dart`)
+#### 4.2 Login Screen (`features/auth/presentation/screens/login_screen.dart`)
 
 **Widget Type**: `ConsumerWidget` (provides WidgetRef)
 
@@ -468,7 +472,7 @@ child: authState is AuthLoading
 onPressed: authState is AuthLoading ? null : () { ... },
 ```
 
-#### 4.3 Home Screen (`screens/home_screen.dart`)
+#### 4.3 Home Screen (`features/home_dashboard/presentation/screens/home_dashboard_screen.dart`)
 
 **Purpose**: Post-authentication screen demonstrating:
 - Safe data extraction from authenticated state
@@ -773,28 +777,34 @@ ElevatedButton(
 )
 ```
 
-### Multi-State Applications
+### Multi-State Applications (Clean Architecture)
 
-For apps with multiple independent state domains:
+For apps with multiple independent state domains (current structure):
 
 ```
 lib/
 ├── features/
 │   ├── auth/
-│   │   ├── models/
-│   │   ├── repositories/
-│   │   ├── providers/
-│   │   └── screens/
-│   ├── profile/
-│   │   ├── models/
-│   │   ├── repositories/
-│   │   ├── providers/
-│   │   └── screens/
-│   └── settings/
-│       ├── models/
-│       ├── repositories/
-│       ├── providers/
-│       └── screens/
+│   │   ├── data/
+│   │   │   ├── datasources/
+│   │   │   ├── models/
+│   │   │   └── repository/
+│   │   ├── domain/
+│   │   │   ├── entities/
+│   │   │   ├── repositories/
+│   │   │   └── usecases/
+│   │   └── presentation/
+│   │       ├── providers/
+│   │       ├── screens/
+│   │       └── widgets/
+│   ├── expenses/
+│   │   ├── data/
+│   │   ├── domain/
+│   │   └── presentation/
+│   └── profile/
+│       ├── data/
+│       ├── domain/
+│       └── presentation/
 ```
 
 Each feature has its own state management, but can access shared providers:

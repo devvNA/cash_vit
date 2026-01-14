@@ -1,9 +1,9 @@
-import 'package:cash_vit/screens/splash_screen/splash_screen.dart';
-import 'package:cash_vit/utils/services/local_storage_services.dart';
+import 'package:cash_vit/core/services/local_storage_services.dart';
+import 'package:cash_vit/features/splash_screen/presentation/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'utils/themes/index.dart';
+import 'core/themes/index.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

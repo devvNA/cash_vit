@@ -1,29 +1,33 @@
+<coding_guidelines>
 # Cash Vit - Expense Tracker
 
 ## Project Snapshot
-Flutter mobile expense tracker with authentication and CRUD operations.
-- **State**: Riverpod (StateNotifierProvider pattern)
+Flutter mobile expense tracker with Clean Architecture.
+- **State**: Riverpod (@riverpod annotation, sealed class states)
 - **API**: FakeStore API (https://fakestoreapi.com)
-- **Storage**: In-memory only
-- **Structure**: Flat, feature-based organization
+- **HTTP**: Dio with PrettyDioLogger
+- **Storage**: SharedPreferences via LocalStorageService singleton
+- **Architecture**: Feature-first Clean Architecture (data → domain → presentation)
 
-**Important**: Each major directory has its own AGENTS.md with specific patterns and examples.
+**Important**: Each major directory has its own AGENTS.md with specific patterns.
 
 ## Root Setup Commands
 ```bash
-flutter pub get              # Install dependencies
-flutter analyze              # Static analysis
-flutter test                 # Run all tests
-flutter run                  # Run app (debug)
-flutter build apk            # Build Android APK
+flutter pub get                        # Install dependencies
+dart run build_runner build            # Generate Riverpod code
+flutter analyze                        # Static analysis
+flutter test                           # Run all tests
+flutter run                            # Run app (debug)
+flutter build apk                      # Build Android APK
 ```
 
 ## Universal Conventions
 - **Code Style**: Follow `flutter_lints` rules
 - **Imports**: Use `package:cash_vit/...` for absolute paths
-- **State**: ALL state via Riverpod providers (no setState in StatefulWidget)
+- **State**: ALL feature state via Riverpod (sealed classes in providers)
 - **Const**: Use `const` constructors wherever possible
 - **Commits**: Conventional Commits format (`feat:`, `fix:`, `refactor:`)
+- **Immutability**: Models use `copyWith()` pattern, never mutate state directly
 
 ## Documentation References
 - **Product Requirements**: [docs/PRD.md](docs/PRD.md)
@@ -33,37 +37,39 @@ flutter build apk            # Build Android APK
 ## Security & Secrets
 - Never commit API keys or tokens
 - Use `.env` files for sensitive config (not committed)
-- In-memory storage only (no persistent data)
+- Token stored via LocalStorageService (SharedPreferences)
 
 ## JIT Index
 
 ### Package Structure
-- **Models**: `lib/models/` → [see lib/models/AGENTS.md](lib/models/AGENTS.md)
-- **Providers**: `lib/providers/` → [see lib/providers/AGENTS.md](lib/providers/AGENTS.md)
-- **Screens**: `lib/screens/` → [see lib/screens/AGENTS.md](lib/screens/AGENTS.md)
-- **Utils**: `lib/utils/` → [see lib/utils/AGENTS.md](lib/utils/AGENTS.md)
-- **Widgets**: `lib/widgets/` → [see lib/widgets/AGENTS.md](lib/widgets/AGENTS.md)
+- **Core Infrastructure**: `lib/core/` → [see lib/core/AGENTS.md](lib/core/AGENTS.md)
+- **Feature Modules**: `lib/features/` → [see lib/features/AGENTS.md](lib/features/AGENTS.md)
+- **Shared Components**: `lib/shared/` → [see lib/shared/AGENTS.md](lib/shared/AGENTS.md)
 
 ### Quick Find Commands
 ```bash
-# Find screen
-find lib/screens -name "*_screen.dart"
+# Find screen by name
+find lib/features -name "*_screen.dart"
 
 # Find provider
-find lib/providers -name "*_provider.dart"
+find lib/features -path "*/providers/*_provider.dart"
 
 # Find model
-find lib/models -name "*_model.dart"
+find lib/features -path "*/models/*_model.dart"
+
+# Find repository
+find lib/features -path "*/repository/*_repository.dart"
 
 # Search for widget usage
 grep -rn "WidgetName" lib/
 
 # Search for provider usage
-grep -rn "providerName" lib/
+grep -rn "Provider" lib/features/*/presentation/providers/
 ```
 
 ## Definition of Done
 ```bash
 flutter analyze && flutter test
 ```
-No warnings, no test failures.
+No warnings, no test failures, code generation up-to-date.
+</coding_guidelines>

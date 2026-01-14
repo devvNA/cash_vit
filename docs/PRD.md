@@ -95,55 +95,96 @@
 
 ---
 
-## 6. Folder Structure
+## 6. Folder Structure (Clean Architecture)
 ```
 lib/
-├── main.dart                  # App entry point with ProviderScope
-├── models/                    # Data models (User, Expense)
-│   ├── user_model.dart
-│   ├── expense_model.dart
-│   └── index.dart
-├── providers/                 # Riverpod state management
-│   ├── auth_provider.dart
-│   ├── splash_provider.dart
-│   └── expense_provider.dart (future)
-├── repositories/              # Data layer abstraction (future)
-│   └── auth_repository.dart (future)
-├── screens/                   # UI screens (feature-based)
-│   ├── splash_screen/
-│   │   └── splash_screen.dart
-│   ├── auth/
-│   │   └── login_screen.dart
-│   ├── base/
-│   │   ├── base_screen.dart
+├── main.dart                           # App entry point with ProviderScope
+│
+├── core/                               # Shared infrastructure (app-wide)
+│   ├── constants/
+│   │   └── api_constants.dart          # API endpoints, timeouts
+│   ├── services/
+│   │   ├── api_services.dart           # Dio-based HTTP client
+│   │   └── local_storage_services.dart # SharedPreferences wrapper
+│   └── themes/                         # Design system implementation
+│       ├── app_colors.dart
+│       ├── app_typography.dart
+│       ├── app_spacing.dart
+│       ├── app_theme.dart
+│       └── index.dart                  # Barrel export
+│
+├── features/                           # Feature modules (Clean Architecture)
+│   ├── auth/                           # Authentication feature
+│   │   ├── data/
+│   │   │   ├── datasources/            # Remote/local data sources
+│   │   │   ├── models/                 # DTOs, API response models
+│   │   │   └── repository/             # Repository implementations
+│   │   │       └── auth_repository.dart
+│   │   ├── domain/
+│   │   │   ├── entities/               # Business entities
+│   │   │   ├── repositories/           # Repository interfaces
+│   │   │   └── usecases/               # Business logic use cases
+│   │   └── presentation/
+│   │       ├── providers/              # Riverpod state management
+│   │       │   └── auth_provider.dart
+│   │       ├── screens/                # UI screens
+│   │       │   └── login_screen.dart
+│   │       └── widgets/                # Feature-specific widgets
+│   │
+│   ├── splash_screen/                  # Splash screen feature
+│   │   ├── data/
+│   │   ├── domain/
+│   │   └── presentation/
+│   │       ├── providers/splash_provider.dart
+│   │       ├── screens/splash_screen.dart
+│   │       └── widgets/
+│   │
+│   ├── base/                           # Tab navigation shell
+│   │   ├── base_screen.dart            # IndexedStack + BottomNav
 │   │   └── widgets/
 │   │       └── custom_bottom_nav.dart
-│   └── expenses/
-│       ├── expense_list_screen.dart
-│       └── expense_form_screen.dart (future)
-├── widgets/                   # Shared reusable widgets
-│   ├── background_glows.dart
-│   └── custom_button.dart (future)
-└── utils/                     # Infrastructure & helpers
-    ├── constants/
-    │   └── api_constants.dart
-    ├── services/
-    │   ├── api_services.dart
-    │   └── local_storage_services.dart
-    └── themes/                # Design system implementation
-        ├── app_colors.dart
-        ├── app_typography.dart
-        ├── app_spacing.dart
-        ├── app_theme.dart
-        └── index.dart
+│   │
+│   ├── home_dashboard/                 # Home/Dashboard feature
+│   │   ├── data/
+│   │   ├── domain/
+│   │   └── presentation/
+│   │       ├── providers/
+│   │       ├── screens/home_dashboard_screen.dart
+│   │       └── widgets/
+│   │
+│   ├── expenses/                       # Expense management feature
+│   │   ├── data/
+│   │   │   ├── datasources/
+│   │   │   ├── models/expense_model.dart
+│   │   │   └── repository/
+│   │   ├── domain/
+│   │   │   ├── entities/
+│   │   │   ├── repositories/
+│   │   │   └── usecases/
+│   │   └── presentation/
+│   │       ├── providers/
+│   │       ├── screens/expense_list_screen.dart
+│   │       └── widgets/
+│   │
+│   └── profile/                        # User profile feature
+│       ├── data/
+│       │   └── models/user_model.dart
+│       ├── domain/
+│       └── presentation/
+│
+└── shared/                             # Cross-feature shared code
+    ├── extensions/                     # Dart extensions
+    └── widgets/                        # Reusable UI components
+        └── background_glows.dart
 ```
 
-**Key Principles:**
-- **Flat structure** for simplicity (no deep nesting)
-- **Feature-based screens** in `screens/` directory
-- **Shared infrastructure** in `utils/`
-- **Riverpod providers** in dedicated `providers/` folder
-- **Data models** separated in `models/`
+**Architecture Principles:**
+- **Clean Architecture** per feature: data → domain → presentation layers
+- **Feature-first organization**: Each feature is self-contained module
+- **Dependency Rule**: Presentation depends on Domain, Domain is independent
+- **Riverpod providers** in `presentation/providers/` per feature
+- **Shared infrastructure** in `core/` (services, themes, constants)
+- **Cross-feature widgets** in `shared/widgets/`
 
 ---
 
