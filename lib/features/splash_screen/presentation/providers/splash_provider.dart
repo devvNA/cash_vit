@@ -48,10 +48,10 @@ class SplashNotifier extends _$SplashNotifier {
   }
 
   /// Start loading animation (0% → 100% in 3 seconds)
-  /// Updates every 30ms for smooth animation
+  /// Updates every 10ms for smooth animation
   void _startLoading() {
-    // Timer updates progress every 30ms (100 updates in 3 seconds)
-    _timer = Timer.periodic(const Duration(milliseconds: 30), (timer) {
+    // Timer updates progress every 10ms (100 updates in 3 seconds)
+    _timer = Timer.periodic(const Duration(milliseconds: 10), (timer) {
       final currentState = state;
 
       if (currentState is SplashLoading) {

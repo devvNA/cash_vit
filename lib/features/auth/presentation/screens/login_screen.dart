@@ -13,8 +13,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _usernameController = TextEditingController(text: 'johnd');
+  final _passwordController = TextEditingController(text: 'm38rmF\$');
   bool _isPasswordVisible = false;
 
   @override
@@ -172,7 +172,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         Container(
           decoration: BoxDecoration(
             color: AppColors.surfaceWhite,
-            borderRadius: AppRadius.mediumRadius,
+            borderRadius: BorderRadius.circular(25),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.04),
@@ -191,33 +191,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 color: AppColors.textSecondary.withValues(alpha: 0.5),
               ),
               prefixIcon: const Icon(
+                size: 20,
                 Icons.person_outline_rounded,
                 color: AppColors.textSecondary,
               ),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(25),
                 borderSide: BorderSide.none,
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: AppRadius.mediumRadius,
+                borderRadius: BorderRadius.circular(25),
                 borderSide: const BorderSide(color: AppColors.borderLight),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: AppRadius.mediumRadius,
+                borderRadius: BorderRadius.circular(25),
                 borderSide: const BorderSide(
                   color: AppColors.primaryBlue,
                   width: 2,
                 ),
               ),
               disabledBorder: OutlineInputBorder(
-                borderRadius: AppRadius.mediumRadius,
+                borderRadius: BorderRadius.circular(999),
                 borderSide: const BorderSide(color: AppColors.borderLight),
               ),
               filled: true,
               fillColor: AppColors.surfaceWhite,
-              contentPadding: EdgeInsets.symmetric(
-                vertical: AppSpacing.paddingCard,
-              ),
+              contentPadding: EdgeInsets.symmetric(vertical: 16),
             ),
           ),
         ),
@@ -241,7 +240,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         Container(
           decoration: BoxDecoration(
             color: AppColors.surfaceWhite,
-            borderRadius: AppRadius.mediumRadius,
+            borderRadius: BorderRadius.circular(25),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.04),
@@ -262,47 +261,50 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               prefixIcon: const Icon(
                 Icons.lock_outline_rounded,
+                size: 20,
                 color: AppColors.textSecondary,
               ),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _isPasswordVisible
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
-                  color: AppColors.textSecondary,
+              suffixIcon: Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: IconButton(
+                  icon: Icon(
+                    size: 24,
+                    _isPasswordVisible
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                    color: AppColors.textSecondary,
+                  ),
+                  onPressed: isLoading
+                      ? null
+                      : () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
                 ),
-                onPressed: isLoading
-                    ? null
-                    : () {
-                        setState(() {
-                          _isPasswordVisible = !_isPasswordVisible;
-                        });
-                      },
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide.none,
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: AppRadius.mediumRadius,
+                borderRadius: BorderRadius.circular(25),
                 borderSide: const BorderSide(color: AppColors.borderLight),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: AppRadius.mediumRadius,
+                borderRadius: BorderRadius.circular(25),
                 borderSide: const BorderSide(
                   color: AppColors.primaryBlue,
                   width: 2,
                 ),
               ),
               disabledBorder: OutlineInputBorder(
-                borderRadius: AppRadius.mediumRadius,
+                borderRadius: BorderRadius.circular(25),
                 borderSide: const BorderSide(color: AppColors.borderLight),
               ),
               filled: true,
               fillColor: AppColors.surfaceWhite,
-              contentPadding: EdgeInsets.symmetric(
-                vertical: AppSpacing.paddingCard,
-              ),
+              contentPadding: EdgeInsets.symmetric(vertical: 16),
             ),
           ),
         ),
@@ -371,7 +373,7 @@ class _LoginButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 56,
+      height: 52,
       decoration: BoxDecoration(
         gradient: isLoading
             ? LinearGradient(

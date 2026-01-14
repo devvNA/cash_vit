@@ -10,7 +10,6 @@ class SplashScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Listen for side effects (navigation)
     ref.listen<SplashState>(splashProvider, (previous, next) {
       if (next is SplashComplete) {
         Navigator.pushReplacement(

@@ -28,20 +28,19 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     try {
       final response = await apiRequest.post(
         ApiConstants.loginEndpoint,
-        data: {
-          'username': username,
-          'password': password,
-        },
+        data: {'username': username, 'password': password},
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return AuthResponseModel.fromJson(response.data as Map<String, dynamic>);
+        return AuthResponseModel.fromJson(
+          response.data as Map<String, dynamic>,
+        );
       } else {
         throw Exception('Login failed with status: ${response.statusCode}');
       }
     } on DioException catch (e) {
       if (e.response != null) {
-        throw Exception('Login failed: ${e.response?.statusMessage}');
+        throw Exception('Login failed: ${e.response?.data}');
       } else {
         throw Exception('Network error: ${e.message}');
       }

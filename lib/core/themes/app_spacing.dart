@@ -31,7 +31,7 @@ class AppRadius {
   static const double large = 20;
   static const double card = 24;
   static const double button = 24;
-  static const double full = 999;
+  static const double full = 32;
 
   // BorderRadius helpers
   static BorderRadius get smallRadius => BorderRadius.circular(small);
