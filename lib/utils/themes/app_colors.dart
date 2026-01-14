@@ -33,8 +33,11 @@ class AppColors {
 
   // Gradient
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [primaryBlue, primaryBlueDark],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFF2196F3),
+      Color(0xFF1C74D7),
+    ], // primaryBlue to slightly darker blue
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
   );
 }

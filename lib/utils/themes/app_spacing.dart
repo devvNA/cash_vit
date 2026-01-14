@@ -14,7 +14,6 @@ class AppSpacing {
   // Screen padding
   static const double paddingScreen = 24;
   static const double paddingCard = 20;
-  static const double spacingListItem = 16;
 
   // EdgeInsets helpers
   static const EdgeInsets screenPadding = EdgeInsets.all(paddingScreen);

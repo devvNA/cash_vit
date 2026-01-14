@@ -10,7 +10,7 @@ class AppTheme {
   const AppTheme._();
 
   /// Mendapatkan tema utama aplikasi
-  static ThemeData get lightTheme => ThemeData(
+  static ThemeData get theme => ThemeData(
     useMaterial3: false,
     appBarTheme: const AppBarTheme(
       backgroundColor: AppColors.primaryBlue,

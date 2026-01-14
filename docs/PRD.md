@@ -1,0 +1,266 @@
+# Product Requirements Document
+## Expense Tracker Mobile App
+
+---
+
+## 1. Overview
+
+**Aplikasi:** Expense Tracker dengan autentikasi  
+**Platform:** Flutter Mobile  
+**State Management:** Riverpod  
+**API:** FakeStore API (https://fakestoreapi.com)  
+**Storage:** In-Memory only
+
+---
+
+## 2. Features
+
+### 2.1 Authentication
+- Login dengan username & password
+- Tampilkan data user setelah login
+- Logout (clear state)
+
+**API Endpoints:**
+- `POST /auth/login` - Login
+- `GET /users/{id}` - Get user data
+- `DELETE /users/{id}` - Logout simulation
+
+### 2.2 Expense Management
+- Lihat daftar expense/income
+- Tambah expense/income baru
+- Edit expense/income
+- Delete expense/income
+- Tampilkan total balance
+
+**Data disimpan:** In-memory (hilang saat app restart)
+
+---
+
+## 3. Screens
+
+### Screen 1: Login
+- Username field
+- Password field
+- Login button
+- Loading indicator
+- Error message display
+
+### Screen 2: Expense List
+- User info di header
+- Balance summary (Total Income, Total Expense, Balance)
+- List expenses
+- FAB button untuk add
+- Logout button
+
+### Screen 3: Expense Form
+- Title field
+- Amount field
+- Type selector (Income/Expense)
+- Date picker
+- Save button
+
+---
+
+## 4. Data Models
+
+### User
+```dart
+- id: int
+- username: string
+- email: string
+- name: string
+```
+
+### Expense
+```dart
+- id: string
+- title: string
+- amount: double
+- type: enum (income/expense)
+- date: DateTime
+- userId: int
+```
+
+---
+
+## 5. Animations (Required)
+
+1. **Hero Animation:** User avatar dari login ke expense list
+2. **Page Transition:** Slide animation untuk form screen
+3. **Micro-interactions:**
+   - FAB scale animation on tap
+   - List item fade-in
+   - Form field focus animation
+   - Swipe to delete gesture
+
+---
+
+## 6. Folder Structure
+```
+lib/
+├── main.dart                  # App entry point with ProviderScope
+├── models/                    # Data models (User, Expense)
+│   ├── user_model.dart
+│   ├── expense_model.dart
+│   └── index.dart
+├── providers/                 # Riverpod state management
+│   ├── auth_provider.dart
+│   ├── splash_provider.dart
+│   └── expense_provider.dart (future)
+├── repositories/              # Data layer abstraction (future)
+│   └── auth_repository.dart (future)
+├── screens/                   # UI screens (feature-based)
+│   ├── splash_screen/
+│   │   └── splash_screen.dart
+│   ├── auth/
+│   │   └── login_screen.dart
+│   ├── base/
+│   │   ├── base_screen.dart
+│   │   └── widgets/
+│   │       └── custom_bottom_nav.dart
+│   └── expenses/
+│       ├── expense_list_screen.dart
+│       └── expense_form_screen.dart (future)
+├── widgets/                   # Shared reusable widgets
+│   ├── background_glows.dart
+│   └── custom_button.dart (future)
+└── utils/                     # Infrastructure & helpers
+    ├── constants/
+    │   └── api_constants.dart
+    ├── services/
+    │   ├── api_services.dart
+    │   └── local_storage_services.dart
+    └── themes/                # Design system implementation
+        ├── app_colors.dart
+        ├── app_typography.dart
+        ├── app_spacing.dart
+        ├── app_theme.dart
+        └── index.dart
+```
+
+**Key Principles:**
+- **Flat structure** for simplicity (no deep nesting)
+- **Feature-based screens** in `screens/` directory
+- **Shared infrastructure** in `utils/`
+- **Riverpod providers** in dedicated `providers/` folder
+- **Data models** separated in `models/`
+
+---
+
+## 7. Technical Requirements
+
+### Must Have
+- Riverpod untuk state management
+- HTTP client untuk API calls
+- Form validation
+- Error handling untuk network failures
+- Loading states
+- Material Design widgets
+
+- Title: required, max 50 characters
+- Amount: required, > 0
+
+---
+
+## 8. User Flows
+
+### Login Flow
+```
+1. Input username & password
+2. Tap login → Show loading
+3. API call POST /auth/login
+4. Success → Navigate to Expense List
+5. Error → Show error message
+```
+
+### Add Expense Flow
+```
+1. Tap FAB di Expense List
+2. Form screen slides up
+3. Fill form → Tap save
+4. Validate input
+5. Success → Add to list, navigate back
+6. Error → Show error message
+```
+
+### Delete Flow
+```
+1. Swipe expense card
+2. Show confirmation dialog
+3. Confirm → Delete from list
+4. Cancel → Dismiss dialog
+```
+
+---
+
+## 9. Acceptance Criteria
+
+**Functional:**
+- ✓ Login dengan API berhasil
+- ✓ Display user data
+- ✓ CRUD expense (Create, Read, Update, Delete)
+- ✓ Calculate balance correctly
+- ✓ Logout clear state
+
+**Technical:**
+- ✓ 3 screens implemented
+- ✓ 3 API endpoints hit (POST, GET, DELETE)
+- ✓ Riverpod digunakan
+- ✓ Hero animation implemented
+- ✓ Min 3 micro-interactions
+- ✓ Code terstruktur & clean
+- ✓ README.md ada
+
+---
+
+## 10. README.md Structure
+```markdown
+# Expense Tracker App
+
+## Fitur
+- Login/Logout
+- Manage Expenses & Income
+- Balance Summary
+
+## Tech Stack
+- Flutter
+- Riverpod
+- FakeStore API
+
+## Folder Structure
+[Penjelasan folder]
+
+## How to Run
+[Setup steps]
+
+## API Endpoints
+[List endpoints used]
+
+## Limitations
+- Data in-memory only
+- FakeStore API constraints
+```
+
+---
+
+## 11. Test Credentials
+```
+Username: mor_2314
+Password: 83r5^_
+```
+
+---
+
+## 12. Out of Scope
+
+- Persistent database
+- Real backend
+- Export data
+- Analytics
+- Multi-language
+- Dark mode
+
+---
+
+**Estimation:** 8-10 jam development  
+**Version:** 1.0
