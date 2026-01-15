@@ -248,16 +248,12 @@ class _ProfileInfo extends StatelessWidget {
           clipBehavior: Clip.none,
           children: [
             Container(
-              width: 112,
-              height: 112,
+              width: 100,
+              height: 100,
               padding: const EdgeInsets.all(4),
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [AppColors.primaryBlue, AppColors.accentBlue],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                gradient: AppColors.primaryGradient,
               ),
               child: Container(
                 decoration: BoxDecoration(
@@ -272,7 +268,7 @@ class _ProfileInfo extends StatelessWidget {
                     color: AppColors.primaryBlue.withValues(alpha: 0.1),
                     child: Center(
                       child: Text(
-                        firstName[0].toUpperCase(),
+                        firstName[0],
                         style: AppTypography.display.copyWith(
                           color: AppColors.primaryBlue,
                           fontWeight: FontWeight.bold,
@@ -287,6 +283,8 @@ class _ProfileInfo extends StatelessWidget {
               bottom: 0,
               right: 0,
               child: Container(
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
                   color: AppColors.primaryBlue,
                   shape: BoxShape.circle,
@@ -312,13 +310,7 @@ class _ProfileInfo extends StatelessWidget {
           ],
         ),
         SizedBox(height: AppSpacing.lg),
-        Text(
-          fullName,
-          style: AppTypography.headline2.copyWith(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
+        Text(fullName, style: AppTypography.headline4),
         SizedBox(height: AppSpacing.xs),
         Text(
           email,
@@ -378,7 +370,7 @@ class _StatCard extends StatelessWidget {
           SizedBox(height: AppSpacing.xs),
           Text(
             value,
-            style: AppTypography.headline3.copyWith(color: valueColor),
+            style: AppTypography.headline5.copyWith(color: valueColor),
           ),
         ],
       ),
@@ -395,13 +387,7 @@ class _SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(bottom: AppSpacing.sm),
-      child: Text(
-        title,
-        style: AppTypography.headline3.copyWith(
-          color: AppColors.textPrimary,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
+      child: Text(title, style: AppTypography.headline5),
     );
   }
 }
@@ -454,9 +440,8 @@ class _ProfileTile extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: AppTypography.headline5.copyWith(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w700,
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 SizedBox(height: AppSpacing.xs),
@@ -491,13 +476,10 @@ class _LogoutButton extends StatelessWidget {
         foregroundColor: AppColors.expenseRed,
         shape: RoundedRectangleBorder(borderRadius: AppRadius.cardRadius),
       ),
-      icon: const Icon(Icons.logout),
+      icon: const Icon(Icons.logout, size: 20),
       label: Text(
         'Log Out',
-        style: AppTypography.headline5.copyWith(
-          color: AppColors.expenseRed,
-          fontWeight: FontWeight.w700,
-        ),
+        style: AppTypography.buttonMedium.copyWith(color: AppColors.expenseRed),
       ),
     );
   }

@@ -1,6 +1,5 @@
 import 'package:cash_vit/core/themes/index.dart';
-import 'package:cash_vit/features/auth/presentation/providers/auth_provider.dart';
-import 'package:cash_vit/features/auth/presentation/screens/login_screen.dart';
+import 'package:cash_vit/features/profile/presentation/providers/profile_provider.dart';
 import 'package:cash_vit/shared/widgets/background_glows.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -60,14 +59,6 @@ class _HomeDashboardScreenState extends ConsumerState<HomeDashboardScreen> {
     ),
   ];
 
-  void _onLogout() {
-    ref.read(authProvider.notifier).logout();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final filteredTransactions = _transactions
@@ -92,7 +83,7 @@ class _HomeDashboardScreenState extends ConsumerState<HomeDashboardScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _Header(onLogout: _onLogout),
+                  _Header(),
                   SizedBox(height: AppSpacing.lg),
                   _FilterChips(
                     filters: _filters,
@@ -114,13 +105,26 @@ class _HomeDashboardScreenState extends ConsumerState<HomeDashboardScreen> {
   }
 }
 
-class _Header extends StatelessWidget {
-  final VoidCallback onLogout;
+class _Header extends ConsumerWidget {
+  const _Header();
 
-  const _Header({required this.onLogout});
+  /// Helper method to capitalize first letter of a string
+  String _capitalizeFirstLetter(String text) {
+    if (text.isEmpty) return text;
+    return text[0].toUpperCase() + text.substring(1).toLowerCase();
+  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profileState = ref.watch(profileProvider);
+
+    // Extract user's first name from profile state
+    String userName = 'User';
+    if (profileState is ProfileLoaded) {
+      final rawName = profileState.profile.name?.firstname ?? 'User';
+      userName = _capitalizeFirstLetter(rawName);
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,7 +141,7 @@ class _Header extends StatelessWidget {
             ),
             SizedBox(height: AppSpacing.xs),
             Text(
-              'David',
+              userName,
               style: AppTypography.headline4.copyWith(
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.w700,
@@ -164,19 +168,6 @@ class _Header extends StatelessWidget {
                 icon: const Icon(Icons.notifications_outlined),
                 color: AppColors.textPrimary,
                 onPressed: () {},
-              ),
-            ),
-            SizedBox(width: AppSpacing.sm),
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.surfaceWhite,
-                borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: AppColors.borderLight),
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.logout),
-                color: AppColors.textSecondary,
-                onPressed: onLogout,
               ),
             ),
           ],
@@ -407,13 +398,7 @@ class _RecentTransactions extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Recent transactions',
-              style: AppTypography.headline4.copyWith(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+            Text('Recent transactions', style: AppTypography.headline5),
             TextButton.icon(
               onPressed: () {},
               style: TextButton.styleFrom(
@@ -467,12 +452,12 @@ class _TransactionTile extends StatelessWidget {
         : '-\$${item.amount.abs().toStringAsFixed(0)}';
     final amountColor = item.amount >= 0
         ? AppColors.incomeGreen
-        : AppColors.textPrimary;
+        : AppColors.expenseRed;
 
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
       ),
       decoration: BoxDecoration(
         color: AppColors.surfaceWhite,
@@ -503,9 +488,8 @@ class _TransactionTile extends StatelessWidget {
               children: [
                 Text(
                   item.title,
-                  style: AppTypography.headline4.copyWith(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w700,
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 SizedBox(height: AppSpacing.xs),
@@ -523,9 +507,9 @@ class _TransactionTile extends StatelessWidget {
             children: [
               Text(
                 amountText,
-                style: AppTypography.headline3.copyWith(
+                style: AppTypography.bodyLarge.copyWith(
+                  fontWeight: FontWeight.bold,
                   color: amountColor,
-                  fontWeight: FontWeight.w700,
                 ),
               ),
               SizedBox(height: AppSpacing.xs),

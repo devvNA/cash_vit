@@ -47,10 +47,8 @@ class SplashScreen extends ConsumerWidget {
                       // Brand Name
                       Text(
                         'CashVit',
-                        style: AppTypography.display.copyWith(
+                        style: AppTypography.headline1.copyWith(
                           color: AppColors.textPrimary,
-                          height: 1.1,
-                          letterSpacing: -0.5,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -61,7 +59,6 @@ class SplashScreen extends ConsumerWidget {
                         'TRACK. SAVE. GROW.',
                         style: AppTypography.bodyMedium.copyWith(
                           color: AppColors.textSecondary,
-                          letterSpacing: 1.5,
                           fontWeight: FontWeight.w500,
                         ),
                         textAlign: TextAlign.center,

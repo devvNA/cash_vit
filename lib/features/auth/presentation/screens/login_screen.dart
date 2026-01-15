@@ -163,7 +163,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           padding: EdgeInsets.only(left: AppSpacing.xs, bottom: AppSpacing.sm),
           child: Text(
             'Username',
-            style: AppTypography.caption.copyWith(color: AppColors.textPrimary),
+            style: AppTypography.headline6.copyWith(
+              color: AppColors.textPrimary,
+            ),
           ),
         ),
         Container(
@@ -181,7 +183,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: TextFormField(
             controller: _usernameController,
             enabled: !isLoading,
-            style: AppTypography.bodyLarge,
             decoration: InputDecoration(
               hintText: 'johnd',
               hintStyle: AppTypography.bodyLarge.copyWith(
@@ -213,7 +214,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               filled: true,
               fillColor: AppColors.surfaceWhite,
-              contentPadding: EdgeInsets.symmetric(vertical: 16),
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
             ),
           ),
         ),
@@ -229,7 +234,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           padding: EdgeInsets.only(left: AppSpacing.xs, bottom: AppSpacing.sm),
           child: Text(
             'Password',
-            style: AppTypography.headline3.copyWith(
+            style: AppTypography.headline6.copyWith(
               color: AppColors.textPrimary,
             ),
           ),
@@ -247,10 +252,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ],
           ),
           child: TextFormField(
+            textAlignVertical: TextAlignVertical.center,
             controller: _passwordController,
             enabled: !isLoading,
             obscureText: !_isPasswordVisible,
-            style: AppTypography.bodyLarge,
             decoration: InputDecoration(
               hintText: '******',
               hintStyle: AppTypography.bodyLarge.copyWith(
@@ -301,7 +306,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               filled: true,
               fillColor: AppColors.surfaceWhite,
-              contentPadding: EdgeInsets.symmetric(vertical: 16),
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
             ),
           ),
         ),
@@ -339,20 +348,11 @@ class _LoginHeader extends StatelessWidget {
           ),
         ),
         SizedBox(height: AppSpacing.xl),
-        Text(
-          'Welcome Back',
-          style: AppTypography.headline3.copyWith(
-            color: AppColors.textPrimary,
-            letterSpacing: -0.5,
-          ),
-          textAlign: TextAlign.center,
-        ),
+        Text('Welcome Back', style: AppTypography.headline2),
         SizedBox(height: AppSpacing.sm),
         Text(
           'Please enter your details to sign in',
-          style: AppTypography.bodyLarge.copyWith(
-            color: AppColors.textSecondary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.textSecondary),
           textAlign: TextAlign.center,
         ),
       ],
