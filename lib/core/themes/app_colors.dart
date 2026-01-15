@@ -5,7 +5,7 @@ class AppColors {
 
   // Primary
   static const Color primaryBlue = Color(0xFF2196F3);
-  static const Color primaryBlueDark = Color(0xFF1976D2);
+  static const Color primaryBlueDark = Color(0xFF2963E9);
   static const Color accentBlue = Color(0xFF64B5F6);
 
   // Semantic

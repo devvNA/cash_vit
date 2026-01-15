@@ -46,8 +46,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const _StatusBar(),
-                        SizedBox(height: AppSpacing.md),
+                        // const _StatusBar(),
+                        // SizedBox(height: AppSpacing.md),
                         const _Header(),
                         SizedBox(height: AppSpacing.lg),
                         _AmountCard(controller: _amountController),
@@ -90,38 +90,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 }
 
-class _StatusBar extends StatelessWidget {
-  const _StatusBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          '10:00',
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        Row(
-          children: const [
-            Icon(Icons.signal_cellular_alt, size: 16),
-            SizedBox(width: AppSpacing.xs),
-            Icon(Icons.wifi, size: 16),
-            SizedBox(width: AppSpacing.xs),
-            RotatedBox(
-              quarterTurns: 1,
-              child: Icon(Icons.battery_full, size: 16),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
 class _Header extends StatelessWidget {
   const _Header();
 
@@ -136,14 +104,10 @@ class _Header extends StatelessWidget {
         Expanded(
           child: Center(
             child: Padding(
-              padding: const EdgeInsets.only(right: 44),
-              child: Text(
-                'Add transaction',
-                style: AppTypography.headline3.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+              padding: const EdgeInsets.only(
+                right: 48,
+              ), // Match button width for perfect center
+              child: Text('Add transaction', style: AppTypography.headline5),
             ),
           ),
         ),
@@ -184,7 +148,10 @@ class _AmountCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: 24, // Increased vertical padding
+      ),
       decoration: BoxDecoration(
         color: AppColors.surfaceWhite,
         borderRadius: AppRadius.mediumRadius,
@@ -211,26 +178,30 @@ class _AmountCard extends StatelessWidget {
             children: [
               Text(
                 '\$',
-                style: AppTypography.headline6.copyWith(
-                  color: AppColors.textPrimary,
+                style: AppTypography.headline3.copyWith(
+                  color: AppColors.primaryBlue,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: TextField(
+                  textAlignVertical: TextAlignVertical.center,
                   controller: controller,
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
-                  style: AppTypography.headline6.copyWith(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  decoration: const InputDecoration(
+                  style: AppTypography.headline3,
+                  decoration: InputDecoration(
                     hintText: '0.00',
+                    hintStyle: AppTypography.headline1.copyWith(
+                      color: AppColors.textSecondary.withValues(alpha: 0.3),
+                    ),
                     border: InputBorder.none,
-                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 8,
+                    ),
                   ),
                 ),
               ),
@@ -248,7 +219,10 @@ class _CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: 20,
+      ),
       decoration: BoxDecoration(
         color: AppColors.surfaceWhite,
         borderRadius: AppRadius.mediumRadius,
@@ -290,13 +264,7 @@ class _CategoryCard extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: AppSpacing.sm),
-                  Text(
-                    'Food',
-                    style: AppTypography.headline3.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+                  Text('Food', style: AppTypography.headline5),
                 ],
               ),
             ],
@@ -328,33 +296,28 @@ class _PaymentOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Reference: Selected item has white background but blue border
     final borderColor = selected
         ? AppColors.primaryBlue
-        : AppColors.borderLight;
-    final backgroundColor = selected && emphasized
-        ? AppColors.primaryBlue.withValues(alpha: 0.08)
-        : AppColors.surfaceWhite;
+        : const Color(0xFFEEEEEE); // Softer border for unselected
 
     return InkWell(
       onTap: onTap,
-      borderRadius: AppRadius.cardRadius,
+      borderRadius: BorderRadius.circular(16), // Softer radius matches image
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.lg,
-          vertical: AppSpacing.md,
+          vertical: 18, // More breathing room
         ),
         decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: AppRadius.cardRadius,
-          border: Border.all(color: borderColor, width: selected ? 2 : 1),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 6),
-            ),
-          ],
+          color: AppColors.surfaceWhite,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: borderColor,
+            width: selected ? 2 : 1.5, // Thicker border for selection
+          ),
+          // Removed shadow slightly to match the flat clean look in image
         ),
         child: Row(
           children: [
@@ -362,11 +325,11 @@ class _PaymentOption extends StatelessWidget {
             SizedBox(width: AppSpacing.md),
             Text(
               label,
-              style: AppTypography.headline4.copyWith(
-                color: selected
-                    ? AppColors.textPrimary
-                    : AppColors.textSecondary,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+              style: AppTypography.bodyLarge.copyWith(
+                // Changed to bodyLarge for better sizing
+                color: AppColors.textPrimary.withValues(alpha: 0.8),
+                fontWeight: FontWeight.w600,
+                fontSize: 15,
               ),
             ),
           ],
@@ -412,11 +375,15 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      title,
-      style: AppTypography.headline2.copyWith(
-        color: AppColors.textPrimary,
-        fontWeight: FontWeight.w700,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Text(
+        title,
+        style: AppTypography.headline5.copyWith(
+          color: AppColors.textPrimary,
+          fontWeight: FontWeight.w700,
+          fontSize: 18,
+        ),
       ),
     );
   }
@@ -430,63 +397,47 @@ class _ActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
+    return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.paddingScreen,
-        vertical: AppSpacing.lg,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.backgroundLight.withValues(alpha: 0.9),
-        border: const Border(top: BorderSide(color: AppColors.borderLight)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, -4),
-          ),
-        ],
+        horizontal: AppSpacing.xxl,
+        vertical: AppSpacing.xl,
       ),
       child: Row(
         children: [
           Expanded(
-            child: OutlinedButton(
-              onPressed: onDraft,
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                shape: RoundedRectangleBorder(
-                  borderRadius: AppRadius.cardRadius,
+            child: SizedBox(
+              height: 50,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  side: const BorderSide(color: Color(0xFFC1BFBF)),
                 ),
-                side: const BorderSide(color: AppColors.borderLight),
-                foregroundColor: AppColors.textPrimary,
-                backgroundColor: AppColors.surfaceWhite,
-              ),
-              child: Text(
-                'Draft',
-                style: AppTypography.headline3.copyWith(
-                  fontWeight: FontWeight.w700,
+                onPressed: () {},
+                child: Text(
+                  "Draft",
+                  style: AppTypography.buttonMedium.copyWith(
+                    color: Colors.black,
+                  ),
                 ),
               ),
             ),
           ),
           SizedBox(width: AppSpacing.md),
           Expanded(
-            child: ElevatedButton(
-              onPressed: onAdd,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                shape: RoundedRectangleBorder(
-                  borderRadius: AppRadius.cardRadius,
+            child: SizedBox(
+              height: 50,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryBlueDark,
+                  foregroundColor: Colors.white,
                 ),
-                backgroundColor: AppColors.primaryBlue,
-                shadowColor: AppColors.primaryBlue.withValues(alpha: 0.35),
-                elevation: 8,
-              ),
-              child: Text(
-                'Add',
-                style: AppTypography.headline3.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
+                onPressed: () {},
+                child: Text(
+                  "Add",
+                  style: AppTypography.buttonMedium.copyWith(
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
