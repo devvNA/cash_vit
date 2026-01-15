@@ -1,6 +1,6 @@
 import 'package:cash_vit/core/themes/index.dart';
 import 'package:cash_vit/features/auth/presentation/providers/auth_provider.dart';
-import 'package:cash_vit/features/base/base_screen.dart';
+import 'package:cash_vit/features/base/presentation/screens/base_screen.dart';
 import 'package:cash_vit/shared/widgets/background_glows.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -106,7 +106,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                           child: Text(
                             'Forgot password?',
-                            style: AppTypography.textTheme.bodyMedium?.copyWith(
+                            style: AppTypography.bodyMedium.copyWith(
                               color: AppColors.primaryBlue,
                               fontWeight: FontWeight.w600,
                             ),
@@ -128,7 +128,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         children: [
                           Text(
                             "Don't have an account?",
-                            style: AppTypography.textTheme.bodyMedium?.copyWith(
+                            style: AppTypography.bodyMedium.copyWith(
                               color: AppColors.textSecondary,
                             ),
                           ),
@@ -136,11 +136,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             onPressed: isLoading ? null : () {},
                             child: Text(
                               'Sign up now',
-                              style: AppTypography.textTheme.bodyMedium
-                                  ?.copyWith(
-                                    color: AppColors.primaryBlue,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                              style: AppTypography.bodyMedium.copyWith(
+                                color: AppColors.primaryBlue,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                         ],
@@ -164,9 +163,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           padding: EdgeInsets.only(left: AppSpacing.xs, bottom: AppSpacing.sm),
           child: Text(
             'Username',
-            style: AppTypography.textTheme.labelLarge?.copyWith(
-              color: AppColors.textPrimary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.textPrimary),
           ),
         ),
         Container(
@@ -184,10 +181,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: TextFormField(
             controller: _usernameController,
             enabled: !isLoading,
-            style: AppTypography.textTheme.bodyLarge,
+            style: AppTypography.bodyLarge,
             decoration: InputDecoration(
               hintText: 'johnd',
-              hintStyle: AppTypography.textTheme.bodyLarge?.copyWith(
+              hintStyle: AppTypography.bodyLarge.copyWith(
                 color: AppColors.textSecondary.withValues(alpha: 0.5),
               ),
               prefixIcon: const Icon(
@@ -232,7 +229,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           padding: EdgeInsets.only(left: AppSpacing.xs, bottom: AppSpacing.sm),
           child: Text(
             'Password',
-            style: AppTypography.textTheme.labelLarge?.copyWith(
+            style: AppTypography.headline3.copyWith(
               color: AppColors.textPrimary,
             ),
           ),
@@ -253,10 +250,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             controller: _passwordController,
             enabled: !isLoading,
             obscureText: !_isPasswordVisible,
-            style: AppTypography.textTheme.bodyLarge,
+            style: AppTypography.bodyLarge,
             decoration: InputDecoration(
               hintText: '******',
-              hintStyle: AppTypography.textTheme.bodyLarge?.copyWith(
+              hintStyle: AppTypography.bodyLarge.copyWith(
                 color: AppColors.textSecondary.withValues(alpha: 0.5),
               ),
               prefixIcon: const Icon(
@@ -344,7 +341,7 @@ class _LoginHeader extends StatelessWidget {
         SizedBox(height: AppSpacing.xl),
         Text(
           'Welcome Back',
-          style: AppTypography.textTheme.headlineLarge?.copyWith(
+          style: AppTypography.headline3.copyWith(
             color: AppColors.textPrimary,
             letterSpacing: -0.5,
           ),
@@ -353,7 +350,7 @@ class _LoginHeader extends StatelessWidget {
         SizedBox(height: AppSpacing.sm),
         Text(
           'Please enter your details to sign in',
-          style: AppTypography.textTheme.bodyLarge?.copyWith(
+          style: AppTypography.bodyLarge.copyWith(
             color: AppColors.textSecondary,
           ),
           textAlign: TextAlign.center,
@@ -410,7 +407,7 @@ class _LoginButton extends StatelessWidget {
               )
             : Text(
                 'Sign in',
-                style: AppTypography.textTheme.bodyLarge?.copyWith(
+                style: AppTypography.bodyLarge.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),

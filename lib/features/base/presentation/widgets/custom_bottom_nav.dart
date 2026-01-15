@@ -76,7 +76,7 @@ class _NavItem extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               label,
-              style: AppTypography.textTheme.labelSmall?.copyWith(
+              style: AppTypography.bodySmall.copyWith(
                 color: isActive
                     ? AppColors.primaryBlueDark
                     : AppColors.textSecondary,

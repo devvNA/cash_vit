@@ -3,8 +3,7 @@ import 'dart:developer';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../features/expenses/data/models/expense_model.dart';
-import '../../features/profile/data/models/user_model.dart';
+import '../../features/home_dashboard/data/models/expense_model.dart';
 
 /// Service untuk mengelola penyimpanan lokal menggunakan SharedPreferences
 ///
@@ -158,45 +157,6 @@ class LocalStorageService {
     await remove(_keyUserId);
     await remove(_keyUserData);
     return await setLoggedIn(false);
-  }
-
-  // ==================== USER DATA METHODS ====================
-
-  /// Menyimpan data user
-  Future<bool> saveUser(User user) async {
-    try {
-      final userJson = jsonEncode(user.toJson());
-      await setInt(_keyUserId, user.id);
-      return await setString(_keyUserData, userJson);
-    } catch (e) {
-      log('Error saving user: $e');
-      return false;
-    }
-  }
-
-  /// Mengambil data user
-  User? getUser() {
-    try {
-      final userJson = getString(_keyUserData);
-      if (userJson == null) return null;
-
-      final userMap = jsonDecode(userJson) as Map<String, dynamic>;
-      return User.fromJson(userMap);
-    } catch (e) {
-      log('Error getting user: $e');
-      return null;
-    }
-  }
-
-  /// Mengambil user ID
-  int? getUserId() {
-    return getInt(_keyUserId);
-  }
-
-  /// Menghapus data user
-  Future<bool> removeUser() async {
-    await remove(_keyUserId);
-    return await remove(_keyUserData);
   }
 
   // ==================== EXPENSE DATA METHODS ====================

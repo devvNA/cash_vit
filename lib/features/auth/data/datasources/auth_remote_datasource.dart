@@ -6,8 +6,6 @@ import '../models/auth_response_model.dart';
 
 /// Abstract datasource interface for authentication remote operations
 abstract class AuthRemoteDatasource {
-  /// Login with username and password
-  /// Returns [AuthResponseModel] from API response
   Future<AuthResponseModel> login({
     required String username,
     required String password,

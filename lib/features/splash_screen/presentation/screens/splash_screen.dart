@@ -47,7 +47,7 @@ class SplashScreen extends ConsumerWidget {
                       // Brand Name
                       Text(
                         'CashVit',
-                        style: AppTypography.textTheme.displayLarge?.copyWith(
+                        style: AppTypography.display.copyWith(
                           color: AppColors.textPrimary,
                           height: 1.1,
                           letterSpacing: -0.5,
@@ -59,7 +59,7 @@ class SplashScreen extends ConsumerWidget {
                       // Tagline
                       Text(
                         'TRACK. SAVE. GROW.',
-                        style: AppTypography.textTheme.bodyMedium?.copyWith(
+                        style: AppTypography.bodyMedium.copyWith(
                           color: AppColors.textSecondary,
                           letterSpacing: 1.5,
                           fontWeight: FontWeight.w500,
@@ -160,7 +160,7 @@ class _FooterContent extends StatelessWidget {
                 // Footer Text
                 Text(
                   'By Devit Nur Azaqi',
-                  style: AppTypography.textTheme.bodySmall?.copyWith(
+                  style: AppTypography.bodySmall.copyWith(
                     color: AppColors.textSecondary.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w500,
                   ),
@@ -168,7 +168,7 @@ class _FooterContent extends StatelessWidget {
                 SizedBox(height: AppSpacing.xs),
                 Text(
                   'v1.0.0',
-                  style: AppTypography.textTheme.labelSmall?.copyWith(
+                  style: AppTypography.caption.copyWith(
                     color: AppColors.textSecondary.withValues(alpha: 0.5),
                   ),
                 ),

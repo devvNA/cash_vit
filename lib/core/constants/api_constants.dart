@@ -6,7 +6,6 @@ class ApiConstants {
 
   // Auth Endpoints
   static const String loginEndpoint = '/auth/login';
-  static const String addUserEndpoint = '/users';
 
   // User Endpoints
   static String userDetailEndpoint(int userId) => '/users/$userId';

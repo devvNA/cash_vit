@@ -12,18 +12,6 @@ class AuthEntity {
   });
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AuthEntity &&
-          runtimeType == other.runtimeType &&
-          token == other.token &&
-          userId == other.userId &&
-          expiresAt == other.expiresAt;
-
-  @override
-  int get hashCode => token.hashCode ^ userId.hashCode ^ expiresAt.hashCode;
-
-  @override
   String toString() =>
       'AuthEntity(token: $token, userId: $userId, expiresAt: $expiresAt)';
 }

@@ -47,7 +47,7 @@ final class SplashNotifierProvider
   }
 }
 
-String _$splashNotifierHash() => r'17e332615aa1311b950359ac93b53fd3edccb134';
+String _$splashNotifierHash() => r'69211b5c8b7f2222dce16ac9101ad4282f24bdc3';
 
 /// Notifier managing splash screen loading logic (Riverpod 3.x pattern)
 /// Following TECHNICAL_OVERVIEW.md principles with modern Riverpod API
