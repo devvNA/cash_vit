@@ -1,8 +1,12 @@
 import 'package:cash_vit/core/themes/index.dart';
+import 'package:cash_vit/features/home_dashboard/data/models/expense_model.dart';
+import 'package:cash_vit/features/home_dashboard/presentation/providers/transaction_provider.dart';
 import 'package:cash_vit/features/profile/presentation/providers/profile_provider.dart';
+import 'package:cash_vit/shared/extensions/currency_extension.dart';
 import 'package:cash_vit/shared/widgets/background_glows.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 class HomeDashboardScreen extends ConsumerStatefulWidget {
   const HomeDashboardScreen({super.key});
@@ -13,60 +17,11 @@ class HomeDashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeDashboardScreenState extends ConsumerState<HomeDashboardScreen> {
-  final List<String> _filters = const ['All', 'Daily', 'Weekly', 'Monthly'];
+  final List<String> _filters = const ['All', 'Income', 'Expense'];
   String _selectedFilter = 'All';
-
-  final List<_TransactionItem> _transactions = const [
-    _TransactionItem(
-      title: 'Food',
-      subtitle: 'Card',
-      amount: -12,
-      date: 'Mar 07, 2023',
-      icon: Icons.restaurant,
-      backgroundColor: AppColors.categoryFuel,
-      iconColor: AppColors.primaryBlue,
-      period: 'Daily',
-    ),
-    _TransactionItem(
-      title: 'Salary',
-      subtitle: 'Bank Account',
-      amount: 6800,
-      date: 'Mar 07, 2023',
-      icon: Icons.payments,
-      backgroundColor: AppColors.categorySalary,
-      iconColor: Color(0xFF2E7D32),
-      period: 'Monthly',
-    ),
-    _TransactionItem(
-      title: 'Entertainment',
-      subtitle: 'Card',
-      amount: -8,
-      date: 'Mar 07, 2023',
-      icon: Icons.confirmation_number,
-      backgroundColor: AppColors.categoryEntertainment,
-      iconColor: Color(0xFF6A1B9A),
-      period: 'Weekly',
-    ),
-    _TransactionItem(
-      title: 'Fuel',
-      subtitle: 'Cash',
-      amount: -45,
-      date: 'Mar 06, 2023',
-      icon: Icons.directions_car,
-      backgroundColor: AppColors.categoryFuel,
-      iconColor: Color(0xFFEF6C00),
-      period: 'Daily',
-    ),
-  ];
 
   @override
   Widget build(BuildContext context) {
-    final filteredTransactions = _transactions
-        .where(
-          (item) => _selectedFilter == 'All' || item.period == _selectedFilter,
-        )
-        .toList();
-
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       body: SafeArea(
@@ -94,7 +49,7 @@ class _HomeDashboardScreenState extends ConsumerState<HomeDashboardScreen> {
                   SizedBox(height: AppSpacing.xl),
                   const _BalanceCard(),
                   SizedBox(height: AppSpacing.xl),
-                  _RecentTransactions(items: filteredTransactions),
+                  _RecentTransactions(filter: _selectedFilter),
                 ],
               ),
             ),
@@ -236,11 +191,21 @@ class _FilterChips extends StatelessWidget {
   }
 }
 
-class _BalanceCard extends StatelessWidget {
+class _BalanceCard extends ConsumerWidget {
   const _BalanceCard();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(transactionProvider);
+
+    double totalIncome = 0;
+    double totalExpense = 0;
+
+    if (state is TransactionLoaded) {
+      totalIncome = state.totalIncome;
+      totalExpense = state.totalExpense;
+    }
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingCard),
       decoration: BoxDecoration(
@@ -254,44 +219,28 @@ class _BalanceCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Stack(
+      child: Row(
         children: [
-          Positioned(
-            right: -40,
-            top: -40,
-            child: Container(
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                color: AppColors.accentBlue.withValues(alpha: 0.15),
-                shape: BoxShape.circle,
-              ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _BalanceLine(
+                  color: AppColors.incomeGreen,
+                  label: 'Income',
+                  value: totalIncome.toRupiah,
+                ),
+                SizedBox(height: AppSpacing.lg),
+                _BalanceLine(
+                  color: AppColors.expenseRed,
+                  label: 'Spent',
+                  value: totalExpense.toRupiah,
+                ),
+              ],
             ),
           ),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _BalanceLine(
-                      color: AppColors.primaryBlue,
-                      label: 'Income',
-                      value: '\$8,429',
-                    ),
-                    SizedBox(height: AppSpacing.lg),
-                    _BalanceLine(
-                      color: AppColors.accentBlue,
-                      label: 'Spent',
-                      value: '\$3,621',
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(width: AppSpacing.lg),
-              _BalanceProgress(),
-            ],
-          ),
+          SizedBox(width: AppSpacing.lg),
+          _BalanceProgress(income: totalIncome, expense: totalExpense),
         ],
       ),
     );
@@ -348,8 +297,16 @@ class _BalanceLine extends StatelessWidget {
 }
 
 class _BalanceProgress extends StatelessWidget {
+  final double income;
+  final double expense;
+
+  const _BalanceProgress({required this.income, required this.expense});
+
   @override
   Widget build(BuildContext context) {
+    final total = income + expense;
+    final incomeRatio = total > 0 ? income / total : 0.5;
+
     return SizedBox(
       width: 112,
       height: 112,
@@ -363,11 +320,11 @@ class _BalanceProgress extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: SweepGradient(
                 colors: [
-                  AppColors.primaryBlue,
-                  AppColors.primaryBlue,
-                  AppColors.accentBlue,
+                  AppColors.incomeGreen,
+                  AppColors.incomeGreen,
+                  AppColors.expenseRed,
                 ],
-                stops: const [0.0, 0.7, 1.0],
+                stops: [0.0, incomeRatio, 1.0],
               ),
             ),
           ),
@@ -385,13 +342,25 @@ class _BalanceProgress extends StatelessWidget {
   }
 }
 
-class _RecentTransactions extends StatelessWidget {
-  final List<_TransactionItem> items;
+class _RecentTransactions extends ConsumerWidget {
+  final String filter;
 
-  const _RecentTransactions({required this.items});
+  const _RecentTransactions({required this.filter});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(transactionProvider);
+
+    List<Expense> transactions = [];
+    if (state is TransactionLoaded) {
+      transactions = state.transactions.where((e) {
+        if (filter == 'All') return true;
+        if (filter == 'Income') return e.type == ExpenseType.income;
+        if (filter == 'Expense') return e.type == ExpenseType.expense;
+        return true;
+      }).toList();
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -423,36 +392,75 @@ class _RecentTransactions extends StatelessWidget {
           ],
         ),
         SizedBox(height: AppSpacing.md),
-        Column(
-          children: items
-              .map(
-                (item) => Padding(
-                  padding: EdgeInsets.only(
-                    bottom: item == items.last ? 0 : AppSpacing.md,
-                  ),
-                  child: _TransactionTile(item: item),
+        if (transactions.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceWhite,
+              borderRadius: AppRadius.cardRadius,
+            ),
+            child: Center(
+              child: Text(
+                'No transactions yet',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
                 ),
-              )
-              .toList(),
-        ),
+              ),
+            ),
+          )
+        else
+          Column(
+            children: transactions
+                .take(10)
+                .toList()
+                .asMap()
+                .entries
+                .map(
+                  (entry) => TweenAnimationBuilder<double>(
+                    key: ValueKey(entry.value.id),
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: Duration(milliseconds: 300 + (entry.key * 80)),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, value, child) {
+                      return Opacity(
+                        opacity: value,
+                        child: Transform.translate(
+                          offset: Offset(0, 20 * (1 - value)),
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              bottom:
+                                  entry.key == transactions.take(10).length - 1
+                                  ? 0
+                                  : AppSpacing.md,
+                            ),
+                            child: _TransactionTile(expense: entry.value),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                )
+                .toList(),
+          ),
       ],
     );
   }
 }
 
 class _TransactionTile extends StatelessWidget {
-  final _TransactionItem item;
+  final Expense expense;
 
-  const _TransactionTile({required this.item});
+  const _TransactionTile({required this.expense});
 
   @override
   Widget build(BuildContext context) {
-    final amountText = item.amount >= 0
-        ? '+\$${item.amount.toStringAsFixed(0)}'
-        : '-\$${item.amount.abs().toStringAsFixed(0)}';
-    final amountColor = item.amount >= 0
-        ? AppColors.incomeGreen
-        : AppColors.expenseRed;
+    final category = TransactionCategory.getByName(expense.category ?? 'Other');
+    final isIncome = expense.type == ExpenseType.income;
+
+    final amountText = isIncome
+        ? '+ ${expense.amount.toRupiah}'
+        : '- ${expense.amount.toRupiah}';
+    final amountColor = isIncome ? AppColors.incomeGreen : AppColors.expenseRed;
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -476,10 +484,10 @@ class _TransactionTile extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: item.backgroundColor,
+              color: category.backgroundColor,
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(item.icon, color: item.iconColor),
+            child: Icon(category.icon, color: category.color),
           ),
           SizedBox(width: AppSpacing.md),
           Expanded(
@@ -487,14 +495,14 @@ class _TransactionTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item.title,
+                  expense.title,
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 SizedBox(height: AppSpacing.xs),
                 Text(
-                  item.subtitle,
+                  expense.category ?? 'Other',
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -514,7 +522,7 @@ class _TransactionTile extends StatelessWidget {
               ),
               SizedBox(height: AppSpacing.xs),
               Text(
-                item.date,
+                DateFormat('dd MMM').format(expense.date),
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.textSecondary,
                 ),
@@ -525,26 +533,4 @@ class _TransactionTile extends StatelessWidget {
       ),
     );
   }
-}
-
-class _TransactionItem {
-  final String title;
-  final String subtitle;
-  final double amount;
-  final String date;
-  final IconData icon;
-  final Color backgroundColor;
-  final Color iconColor;
-  final String period;
-
-  const _TransactionItem({
-    required this.title,
-    required this.subtitle,
-    required this.amount,
-    required this.date,
-    required this.icon,
-    required this.backgroundColor,
-    required this.iconColor,
-    required this.period,
-  });
 }

@@ -1,4 +1,14 @@
 import 'package:cash_vit/core/themes/index.dart';
+import 'package:cash_vit/features/add_transaction/presentation/widgets/add_transaction_actions.dart';
+import 'package:cash_vit/features/add_transaction/presentation/widgets/add_transaction_header.dart';
+import 'package:cash_vit/features/add_transaction/presentation/widgets/amount_input_card.dart';
+import 'package:cash_vit/features/add_transaction/presentation/widgets/category_selector.dart';
+import 'package:cash_vit/features/add_transaction/presentation/widgets/expense_type_selector.dart';
+import 'package:cash_vit/features/add_transaction/presentation/widgets/payment_method_selector.dart';
+import 'package:cash_vit/features/add_transaction/presentation/widgets/success_dialog.dart';
+import 'package:cash_vit/features/add_transaction/presentation/widgets/title_input_card.dart';
+import 'package:cash_vit/features/home_dashboard/data/models/expense_model.dart';
+import 'package:cash_vit/features/home_dashboard/presentation/providers/transaction_provider.dart';
 import 'package:cash_vit/shared/widgets/background_glows.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,15 +24,76 @@ class AddTransactionScreen extends ConsumerStatefulWidget {
 enum _PaymentType { cash, card, check }
 
 class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
-  final TextEditingController _amountController = TextEditingController(
-    text: '12.00',
-  );
+  final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
   _PaymentType _paymentType = _PaymentType.cash;
+  ExpenseType _expenseType = ExpenseType.expense;
+  TransactionCategory _selectedCategory = TransactionCategory.categories.first;
 
   @override
   void dispose() {
     _amountController.dispose();
+    _titleController.dispose();
     super.dispose();
+  }
+
+  void _handleAddTransaction() async {
+    // Validate
+    final title = _titleController.text.trim();
+    final amountText = _amountController.text.trim();
+
+    if (title.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a title'),
+          backgroundColor: AppColors.expenseRed,
+        ),
+      );
+      return;
+    }
+
+    // Remove dots (thousand separators) before parsing
+    final cleanAmountText = amountText.replaceAll('.', '');
+    final amount = double.tryParse(cleanAmountText);
+    if (amount == null || amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid amount'),
+          backgroundColor: AppColors.expenseRed,
+        ),
+      );
+      return;
+    }
+
+    // Create expense
+    final expense = Expense(
+      title: title,
+      amount: amount,
+      type: _expenseType,
+      date: DateTime.now(),
+      userId: 1,
+      category: _selectedCategory.name,
+    );
+
+    // Add via provider
+    ref.read(transactionProvider.notifier).addTransaction(expense);
+
+    // Show success animation
+    await _showSuccessAnimation();
+
+    if (!mounted) return;
+
+    // Navigate back
+    Navigator.pop(context);
+  }
+
+  Future<void> _showSuccessAnimation() async {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withValues(alpha: 0.3),
+      builder: (context) => const SuccessDialog(),
+    );
   }
 
   @override
@@ -46,16 +117,26 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // const _StatusBar(),
-                        // SizedBox(height: AppSpacing.md),
-                        const _Header(),
+                        const AddTransactionHeader(),
                         SizedBox(height: AppSpacing.lg),
-                        _AmountCard(controller: _amountController),
+                        TitleInputCard(controller: _titleController),
                         SizedBox(height: AppSpacing.md),
-                        const _CategoryCard(),
+                        AmountInputCard(controller: _amountController),
+                        SizedBox(height: AppSpacing.md),
+                        ExpenseTypeSelector(
+                          selectedType: _expenseType,
+                          onTypeChanged: (type) =>
+                              setState(() => _expenseType = type),
+                        ),
+                        SizedBox(height: AppSpacing.md),
+                        CategorySelector(
+                          selectedCategory: _selectedCategory,
+                          onCategoryChanged: (category) =>
+                              setState(() => _selectedCategory = category),
+                        ),
                         SizedBox(height: AppSpacing.xl),
-                        const _SectionTitle('Payment Type'),
-                        _PaymentOption(
+                        const SectionTitle('Payment Type'),
+                        PaymentMethodSelector(
                           label: 'Cash',
                           selected: _paymentType == _PaymentType.cash,
                           onTap: () =>
@@ -63,14 +144,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                           emphasized: true,
                         ),
                         SizedBox(height: AppSpacing.sm),
-                        _PaymentOption(
+                        PaymentMethodSelector(
                           label: 'Credit/Debit Card',
                           selected: _paymentType == _PaymentType.card,
                           onTap: () =>
                               setState(() => _paymentType = _PaymentType.card),
                         ),
                         SizedBox(height: AppSpacing.sm),
-                        _PaymentOption(
+                        PaymentMethodSelector(
                           label: 'Check',
                           selected: _paymentType == _PaymentType.check,
                           onTap: () =>
@@ -80,7 +161,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     ),
                   ),
                 ),
-                _ActionButtons(onDraft: () {}, onAdd: () {}),
+                AddTransactionActions(
+                  onDraft: () {},
+                  onAdd: _handleAddTransaction,
+                ),
               ],
             ),
           ],
@@ -90,360 +174,16 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 }
 
-class _Header extends StatelessWidget {
-  const _Header();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        _CircleButton(
-          icon: Icons.chevron_left,
-          onTap: () => Navigator.of(context).maybePop(),
-        ),
-        Expanded(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.only(
-                right: 48,
-              ), // Match button width for perfect center
-              child: Text('Add transaction', style: AppTypography.headline5),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _CircleButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _CircleButton({required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 48,
-        height: 48,
-        decoration: BoxDecoration(
-          color: AppColors.surfaceWhite,
-          shape: BoxShape.circle,
-          border: Border.all(color: AppColors.borderLight),
-        ),
-        child: Icon(icon, color: AppColors.textPrimary),
-      ),
-    );
-  }
-}
-
-class _AmountCard extends StatelessWidget {
-  final TextEditingController controller;
-
-  const _AmountCard({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xl,
-        vertical: 24, // Increased vertical padding
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceWhite,
-        borderRadius: AppRadius.mediumRadius,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Amount',
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          SizedBox(height: AppSpacing.sm),
-          Row(
-            children: [
-              Text(
-                '\$',
-                style: AppTypography.headline3.copyWith(
-                  color: AppColors.primaryBlue,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: TextField(
-                  textAlignVertical: TextAlignVertical.center,
-                  controller: controller,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  style: AppTypography.headline3,
-                  decoration: InputDecoration(
-                    hintText: '0.00',
-                    hintStyle: AppTypography.headline1.copyWith(
-                      color: AppColors.textSecondary.withValues(alpha: 0.3),
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 12,
-                      horizontal: 8,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CategoryCard extends StatelessWidget {
-  const _CategoryCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xl,
-        vertical: 20,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceWhite,
-        borderRadius: AppRadius.mediumRadius,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Category',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              SizedBox(height: AppSpacing.sm),
-              Row(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: AppColors.categoryEntertainment.withValues(
-                        alpha: 0.6,
-                      ),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.restaurant,
-                      color: AppColors.warningOrange,
-                    ),
-                  ),
-                  SizedBox(width: AppSpacing.sm),
-                  Text('Food', style: AppTypography.headline5),
-                ],
-              ),
-            ],
-          ),
-          const Spacer(),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.expand_more),
-            color: AppColors.textSecondary,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PaymentOption extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-  final bool emphasized;
-
-  const _PaymentOption({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-    this.emphasized = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // Reference: Selected item has white background but blue border
-    final borderColor = selected
-        ? AppColors.primaryBlue
-        : const Color(0xFFEEEEEE); // Softer border for unselected
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16), // Softer radius matches image
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: 18, // More breathing room
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceWhite,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: borderColor,
-            width: selected ? 2 : 1.5, // Thicker border for selection
-          ),
-          // Removed shadow slightly to match the flat clean look in image
-        ),
-        child: Row(
-          children: [
-            _RadioDot(selected: selected),
-            SizedBox(width: AppSpacing.md),
-            Text(
-              label,
-              style: AppTypography.bodyLarge.copyWith(
-                // Changed to bodyLarge for better sizing
-                color: AppColors.textPrimary.withValues(alpha: 0.8),
-                fontWeight: FontWeight.w600,
-                fontSize: 15,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _RadioDot extends StatelessWidget {
-  final bool selected;
-
-  const _RadioDot({required this.selected});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 22,
-      height: 22,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: selected ? AppColors.primaryBlue : AppColors.borderLight,
-          width: 2,
-        ),
-      ),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        margin: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.primaryBlue : Colors.transparent,
-          shape: BoxShape.circle,
-        ),
-      ),
-    );
-  }
-}
-
-class _SectionTitle extends StatelessWidget {
+class SectionTitle extends StatelessWidget {
   final String title;
 
-  const _SectionTitle(this.title);
+  const SectionTitle(this.title, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: Text(
-        title,
-        style: AppTypography.headline5.copyWith(
-          color: AppColors.textPrimary,
-          fontWeight: FontWeight.w700,
-          fontSize: 18,
-        ),
-      ),
-    );
-  }
-}
-
-class _ActionButtons extends StatelessWidget {
-  final VoidCallback onDraft;
-  final VoidCallback onAdd;
-
-  const _ActionButtons({required this.onDraft, required this.onAdd});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xxl,
-        vertical: AppSpacing.xl,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: SizedBox(
-              height: 50,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  side: const BorderSide(color: Color(0xFFC1BFBF)),
-                ),
-                onPressed: () {},
-                child: Text(
-                  "Draft",
-                  style: AppTypography.buttonMedium.copyWith(
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: SizedBox(
-              height: 50,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryBlueDark,
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: () {},
-                child: Text(
-                  "Add",
-                  style: AppTypography.buttonMedium.copyWith(
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+      child: Text(title, style: AppTypography.headline6),
     );
   }
 }

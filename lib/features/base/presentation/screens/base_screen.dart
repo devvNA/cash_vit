@@ -12,25 +12,61 @@ class BaseScreen extends StatefulWidget {
   State<BaseScreen> createState() => _BaseScreenState();
 }
 
-class _BaseScreenState extends State<BaseScreen> {
+class _BaseScreenState extends State<BaseScreen>
+    with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
+  late AnimationController _fabAnimationController;
+  late Animation<double> _fabScaleAnimation;
 
   final List<Widget> _screens = [HomeDashboardScreen(), const ProfileScreen()];
+
+  @override
+  void initState() {
+    super.initState();
+    _fabAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _fabScaleAnimation = Tween<double>(begin: 1.0, end: 0.85).animate(
+      CurvedAnimation(parent: _fabAnimationController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _fabAnimationController.dispose();
+    super.dispose();
+  }
+
+  void _onFabPressed() async {
+    // Scale down animation
+    await _fabAnimationController.forward();
+    // Scale back up
+    await _fabAnimationController.reverse();
+
+    if (!mounted) return;
+
+    // Navigate with slide transition from bottom
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) => const AddTransactionScreen(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
       body: IndexedStack(index: _currentIndex, children: _screens),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primaryBlueDark,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddTransactionScreen()),
-          );
-        },
-        child: const Icon(Icons.add),
+      floatingActionButton: ScaleTransition(
+        scale: _fabScaleAnimation,
+        child: FloatingActionButton(
+          backgroundColor: AppColors.primaryBlueDark,
+          onPressed: _onFabPressed,
+          child: const Icon(Icons.add),
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: CustomBottomNav(

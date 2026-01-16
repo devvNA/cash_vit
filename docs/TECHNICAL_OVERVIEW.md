@@ -4,7 +4,7 @@
 
 This document provides a comprehensive technical overview of a production-ready authentication system implemented using Riverpod state management in Flutter. The implementation follows clean architecture principles with clear separation of concerns across multiple layers.
 
-**Target Audience**: AI Agents, Senior Developers, Technical Reviewers, New Team Members
+**Target Audience**: Senior Developers, Technical Reviewers, New Team Members, AI Agents
 
 **Key Technologies**: Flutter, Riverpod 2.4.9, Dart 3.0+
 

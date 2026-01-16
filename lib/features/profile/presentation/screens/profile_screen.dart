@@ -1,7 +1,9 @@
 import 'package:cash_vit/core/themes/index.dart';
 import 'package:cash_vit/features/auth/presentation/providers/auth_provider.dart';
-import 'package:cash_vit/features/auth/presentation/screens/login_screen.dart';
+import 'package:cash_vit/features/home_dashboard/presentation/providers/transaction_provider.dart';
 import 'package:cash_vit/features/profile/presentation/providers/profile_provider.dart';
+import 'package:cash_vit/features/splash_screen/presentation/screens/splash_screen.dart';
+import 'package:cash_vit/shared/extensions/currency_extension.dart';
 import 'package:cash_vit/shared/widgets/background_glows.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,9 +27,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   void _onLogout(BuildContext context) {
     ref.read(authProvider.notifier).logout();
-    Navigator.pushReplacement(
+    // Clear all routes and navigate to SplashScreen
+    Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
+      MaterialPageRoute(builder: (_) => const SplashScreen()),
+      (route) => false, // Remove all previous routes
     );
   }
 
@@ -46,6 +50,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         );
       }
     });
+
+    final state = ref.watch(transactionProvider);
+
+    double totalIncome = 0;
+    double totalExpense = 0;
+
+    if (state is TransactionLoaded) {
+      totalIncome = state.totalIncome;
+      totalExpense = state.totalExpense;
+    }
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
@@ -97,11 +111,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     _ProfileInfo(profile: profile),
                     SizedBox(height: AppSpacing.xl),
                     Row(
-                      children: const [
+                      children: [
                         Expanded(
                           child: _StatCard(
                             label: 'Income',
-                            value: '\$8,429',
+                            value: totalIncome.toRupiah,
                             backgroundColor: Color(0x1A2196F3),
                             valueColor: AppColors.primaryBlue,
                           ),
@@ -110,7 +124,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         Expanded(
                           child: _StatCard(
                             label: 'Spent',
-                            value: '\$3,621',
+                            value: totalExpense.toRupiah,
                             backgroundColor: Color(0x1AF44336),
                             valueColor: AppColors.expenseRed,
                           ),
@@ -139,23 +153,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       icon: Icons.notifications_none,
                       title: 'Notifications',
                       subtitle: 'App alerts, Email settings',
-                      iconBackground: Color(0xFFE3F2FD),
-                      iconColor: AppColors.primaryBlue,
-                    ),
-                    SizedBox(height: AppSpacing.xl),
-                    const _SectionTitle('Security'),
-                    const _ProfileTile(
-                      icon: Icons.lock,
-                      title: 'Security',
-                      subtitle: 'Password, Face ID',
-                      iconBackground: Color(0xFFE3F2FD),
-                      iconColor: AppColors.primaryBlue,
-                    ),
-                    SizedBox(height: AppSpacing.sm),
-                    const _ProfileTile(
-                      icon: Icons.help_outline,
-                      title: 'Help Center',
-                      subtitle: 'FAQ, Contact Support',
                       iconBackground: Color(0xFFE3F2FD),
                       iconColor: AppColors.primaryBlue,
                     ),
@@ -270,7 +267,7 @@ class _ProfileInfo extends StatelessWidget {
                       child: Text(
                         firstName[0],
                         style: AppTypography.display.copyWith(
-                          color: AppColors.primaryBlue,
+                          color: AppColors.surfaceWhite,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

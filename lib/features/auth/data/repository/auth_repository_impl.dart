@@ -1,13 +1,14 @@
-import 'package:cash_vit/core/services/local_storage_services.dart';
-
 import '../../domain/entities/auth_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_datasource.dart';
 
 /// Implementation of [AuthRepository] interface
-/// Coordinates between remote datasource and local storage
+/// Coordinates between remote datasource and in-memory storage
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDatasource remoteDatasource;
+
+  // In-memory storage (data hilang saat app restart)
+  AuthEntity? _currentAuth;
 
   AuthRepositoryImpl({required this.remoteDatasource});
 
@@ -22,39 +23,22 @@ class AuthRepositoryImpl implements AuthRepository {
       password: password,
     );
 
-    // Save to local storage
-    await LocalStorageService().saveAuthToken(model.token);
-    await LocalStorageService().setInt('user_id', model.userId);
-    await LocalStorageService().setLoggedIn(true);
+    // Save to in-memory storage
+    _currentAuth = model.toEntity();
 
     // Return domain entity
-    return model.toEntity();
+    return _currentAuth!;
   }
 
   @override
   Future<void> logout() async {
-    // Clear local storage
-    await LocalStorageService().logout();
+    // Clear in-memory storage
+    _currentAuth = null;
   }
 
   @override
   Future<AuthEntity?> getCurrentAuth() async {
-    // Check if user is logged in
-    final isLoggedIn = LocalStorageService().isLoggedIn();
-    if (!isLoggedIn) return null;
-
-    // Get saved token
-    final token = LocalStorageService().getAuthToken();
-    if (token == null) return null;
-
-    // Get saved user ID
-    final userId = LocalStorageService().getInt('user_id') ?? 0;
-
-    // Return entity
-    return AuthEntity(
-      token: token,
-      userId: userId,
-      expiresAt: DateTime.now().add(const Duration(hours: 24)),
-    );
+    // Return current in-memory auth
+    return _currentAuth;
   }
 }
