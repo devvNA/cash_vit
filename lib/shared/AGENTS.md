@@ -7,9 +7,10 @@ Cross-feature reusable code: widgets, extensions, utilities that don't belong to
 ## Directory Structure
 ```
 shared/
-├── extensions/                 # Dart extensions (future)
+├── extensions/
+│   └── currency_extension.dart  # Currency formatting extensions
 └── widgets/
-    └── background_glows.dart   # Decorative background blobs
+    └── background_glows.dart    # Decorative background blobs
 ```
 
 ## Patterns & Conventions
@@ -42,23 +43,26 @@ class BackgroundGlows extends StatelessWidget {
 }
 ```
 
-### Extension Pattern (Future)
+### Extension Pattern
 Location: `shared/extensions/*.dart`
 
 ```dart
-// Example: String extensions
-extension StringExtension on String {
-  String capitalize() => isEmpty ? '' : '${this[0].toUpperCase()}${substring(1)}';
-}
+// Currency formatting extensions
+import 'package:cash_vit/shared/extensions/currency_extension.dart';
 
-// Example: DateTime extensions
-extension DateTimeExtension on DateTime {
-  String toDisplayFormat() => '$day/$month/$year';
-}
+// Usage examples
+final amount = 1500000.0;
+amount.toRupiah          // "Rp 1.500.000"
+amount.toRupiahCompact   // "Rp 1,5 jt" (for large amounts)
+
+// On int
+final intAmount = 500000;
+intAmount.toRupiah       // "Rp 500.000"
 ```
 
 ## Key Files
 - **Background Effect**: `widgets/background_glows.dart` - Used in splash/login screens
+- **Currency Extension**: `extensions/currency_extension.dart` - Rupiah formatting for amounts
 
 ## Usage
 ```dart

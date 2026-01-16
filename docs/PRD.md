@@ -111,79 +111,145 @@ lib/
 ├── main.dart                           # App entry point with ProviderScope
 │
 ├── core/                               # Shared infrastructure (app-wide)
+│   ├── AGENTS.md                       # AI agent instructions for core layer
 │   ├── constants/
 │   │   └── api_constants.dart          # API endpoints, timeouts
 │   ├── services/
-│   │   ├── api_services.dart           # Dio-based HTTP client
-│   │   └── local_storage_services.dart # SharedPreferences wrapper
-│   └── themes/                         # Design system implementation
-│       ├── app_colors.dart
-│       ├── app_typography.dart
-│       ├── app_spacing.dart
-│       ├── app_theme.dart
-│       └── index.dart                  # Barrel export
+│   │   └── api_services.dart           # Dio-based HTTP client
+│   ├── themes/                         # Design system implementation
+│   │   ├── app_colors.dart
+│   │   ├── app_typography.dart
+│   │   ├── app_spacing.dart
+│   │   ├── app_theme.dart
+│   │   └── index.dart                  # Barrel export
+│   └── utils/
+│       └── currency_formatter.dart     # Number formatting utilities
 │
 ├── features/                           # Feature modules (Clean Architecture)
+│   ├── AGENTS.md                       # AI agent instructions for features
+│   │
 │   ├── auth/                           # Authentication feature
 │   │   ├── data/
-│   │   │   ├── datasources/            # Remote/local data sources
-│   │   │   ├── models/                 # DTOs, API response models
-│   │   │   └── repository/             # Repository implementations
-│   │   │       └── auth_repository.dart
+│   │   │   ├── datasources/
+│   │   │   │   └── auth_remote_datasource.dart
+│   │   │   ├── models/
+│   │   │   │   └── auth_response_model.dart
+│   │   │   └── repository/
+│   │   │       └── auth_repository_impl.dart
 │   │   ├── domain/
-│   │   │   ├── entities/               # Business entities
-│   │   │   ├── repositories/           # Repository interfaces
-│   │   │   └── usecases/               # Business logic use cases
+│   │   │   ├── entities/
+│   │   │   │   └── auth_entity.dart
+│   │   │   ├── repositories/
+│   │   │   │   └── auth_repository.dart
+│   │   │   └── usecases/
+│   │   │       ├── login_usecase.dart
+│   │   │       └── logout_usecase.dart
 │   │   └── presentation/
-│   │       ├── providers/              # Riverpod state management
-│   │       │   └── auth_provider.dart
-│   │       ├── screens/                # UI screens
+│   │       ├── providers/
+│   │       │   ├── auth_provider.dart
+│   │       │   └── auth_provider.g.dart
+│   │       ├── screens/
 │   │       │   └── login_screen.dart
-│   │       └── widgets/                # Feature-specific widgets
+│   │       └── widgets/
+│   │           ├── forgot_password_link.dart
+│   │           ├── index.dart
+│   │           ├── login_button.dart
+│   │           ├── login_header.dart
+│   │           ├── login_text_field.dart
+│   │           └── sign_up_link.dart
 │   │
 │   ├── splash_screen/                  # Splash screen feature
 │   │   ├── data/
 │   │   ├── domain/
 │   │   └── presentation/
-│   │       ├── providers/splash_provider.dart
-│   │       ├── screens/splash_screen.dart
+│   │       ├── providers/
+│   │       │   ├── splash_provider.dart
+│   │       │   └── splash_provider.g.dart
+│   │       ├── screens/
+│   │       │   └── splash_screen.dart
 │   │       └── widgets/
+│   │           ├── footer_content.dart
+│   │           └── logo_brand.dart
 │   │
 │   ├── base/                           # Tab navigation shell
-│   │   ├── base_screen.dart            # IndexedStack + BottomNav
-│   │   └── widgets/
-│   │       └── custom_bottom_nav.dart
+│   │   ├── data/
+│   │   ├── domain/
+│   │   └── presentation/
+│   │       ├── providers/
+│   │       ├── screens/
+│   │       │   └── base_screen.dart    # IndexedStack + BottomNav
+│   │       └── widgets/
+│   │           └── custom_bottom_nav.dart
 │   │
 │   ├── home_dashboard/                 # Home/Dashboard feature
 │   │   ├── data/
-│   │   ├── domain/
-│   │   └── presentation/
-│   │       ├── providers/
-│   │       ├── screens/home_dashboard_screen.dart
-│   │       └── widgets/
-│   │
-│   ├── expenses/                       # Expense management feature
-│   │   ├── data/
 │   │   │   ├── datasources/
-│   │   │   ├── models/expense_model.dart
+│   │   │   ├── models/
+│   │   │   │   └── expense_model.dart
 │   │   │   └── repository/
 │   │   ├── domain/
-│   │   │   ├── entities/
-│   │   │   ├── repositories/
-│   │   │   └── usecases/
 │   │   └── presentation/
 │   │       ├── providers/
-│   │       ├── screens/expense_list_screen.dart
+│   │       │   ├── transaction_provider.dart
+│   │       │   └── transaction_provider.g.dart
+│   │       ├── screens/
+│   │       │   └── home_dashboard_screen.dart
 │   │       └── widgets/
+│   │           ├── filter_chips.dart
+│   │           ├── home_balance_card.dart
+│   │           ├── home_header.dart
+│   │           └── recent_transactions_list.dart
+│   │
+│   ├── add_transaction/                # Add transaction feature
+│   │   ├── data/
+│   │   ├── domain/
+│   │   └── presentation/
+│   │       ├── providers/
+│   │       ├── screens/
+│   │       │   └── add_transaction_screen.dart
+│   │       └── widgets/
+│   │           ├── add_transaction_actions.dart
+│   │           ├── add_transaction_header.dart
+│   │           ├── amount_input_card.dart
+│   │           ├── category_selector.dart
+│   │           ├── expense_type_selector.dart
+│   │           ├── payment_method_selector.dart
+│   │           ├── success_dialog.dart
+│   │           └── title_input_card.dart
 │   │
 │   └── profile/                        # User profile feature
 │       ├── data/
-│       │   └── models/user_model.dart
+│       │   ├── datasources/
+│       │   │   └── profile_remote_datasource.dart
+│       │   ├── models/
+│       │   │   └── user_response_model.dart
+│       │   └── repository/
+│       │       └── profile_repository_impl.dart
 │       ├── domain/
+│       │   ├── entities/
+│       │   │   └── profile_entity.dart
+│       │   ├── repositories/
+│       │   │   └── profile_repository.dart
+│       │   └── usecases/
+│       │       └── get_profile_usecase.dart
 │       └── presentation/
+│           ├── providers/
+│           │   ├── profile_provider.dart
+│           │   └── profile_provider.g.dart
+│           ├── screens/
+│           │   └── profile_screen.dart
+│           └── widgets/
+│               ├── logout_button.dart
+│               ├── profile_avatar_info.dart
+│               ├── profile_header.dart
+│               ├── profile_menu_tile.dart
+│               ├── profile_section_title.dart
+│               └── profile_stat_card.dart
 │
 └── shared/                             # Cross-feature shared code
+    ├── AGENTS.md                       # AI agent instructions for shared
     ├── extensions/                     # Dart extensions
+    │   └── currency_extension.dart
     └── widgets/                        # Reusable UI components
         └── background_glows.dart
 ```
@@ -194,8 +260,9 @@ lib/
 - **Feature-first organization**: Each feature is self-contained module
 - **Dependency Rule**: Presentation depends on Domain, Domain is independent
 - **Riverpod providers** in `presentation/providers/` per feature
-- **Shared infrastructure** in `core/` (services, themes, constants)
+- **Shared infrastructure** in `core/` (services, themes, constants, utils)
 - **Cross-feature widgets** in `shared/widgets/`
+- **AGENTS.md files** in key directories for AI agent context
 
 ---
 
@@ -329,4 +396,5 @@ Password: m38rmF$
 ---
 
 **Estimation:** 8-10 jam development  
-**Version:** 1.0
+**Version:** 1.1  
+**Last Updated:** 2026-01-16

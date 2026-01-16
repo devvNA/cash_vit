@@ -9,7 +9,7 @@ Feature-first organization following Clean Architecture. Each feature is self-co
 features/
 ├── auth/                       # Authentication feature
 │   ├── data/
-│   │   ├── datasources/        # Remote/local data sources
+│   │   ├── datasources/        # Remote data sources
 │   │   ├── models/             # DTOs, API response models
 │   │   └── repository/         # Repository implementations
 │   ├── domain/
@@ -20,11 +20,11 @@ features/
 │       ├── providers/          # Riverpod state management
 │       ├── screens/            # UI screens
 │       └── widgets/            # Feature-specific widgets
-├── splash_screen/
+├── splash_screen/              # Splash screen feature
 ├── base/                       # Tab navigation shell
-├── home_dashboard/
-├── expenses/
-└── profile/
+├── home_dashboard/             # Home dashboard with transactions
+├── add_transaction/            # Add new transaction
+└── profile/                    # User profile
 ```
 
 ## Patterns & Conventions
@@ -160,12 +160,15 @@ class User {
 
 ## Key Files
 - **Auth Provider**: `auth/presentation/providers/auth_provider.dart`
-- **Auth Repository**: `auth/data/repository/auth_repository.dart`
+- **Auth Repository**: `auth/data/repository/auth_repository_impl.dart`
 - **Login Screen**: `auth/presentation/screens/login_screen.dart`
 - **Splash Provider**: `splash_screen/presentation/providers/splash_provider.dart`
-- **Base Screen**: `base/base_screen.dart` (tab navigation)
-- **User Model**: `profile/data/models/user_model.dart`
-- **Expense Model**: `expenses/data/models/expense_model.dart`
+- **Base Screen**: `base/presentation/screens/base_screen.dart` (tab navigation)
+- **Home Dashboard**: `home_dashboard/presentation/screens/home_dashboard_screen.dart`
+- **Add Transaction**: `add_transaction/presentation/screens/add_transaction_screen.dart`
+- **Profile Screen**: `profile/presentation/screens/profile_screen.dart`
+- **User Model**: `profile/data/models/user_response_model.dart`
+- **Expense Model**: `home_dashboard/data/models/expense_model.dart`
 
 ## JIT Index Hints
 ```bash

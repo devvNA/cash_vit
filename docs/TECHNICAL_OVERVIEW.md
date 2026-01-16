@@ -61,12 +61,21 @@ This document provides a comprehensive technical overview of a production-ready 
 
 | Layer | Location | Primary Responsibility | Key Concepts |
 |-------|----------|----------------------|--------------|
-| **Models** | `features/*/data/models/` | Define data structures | Immutability, Sealed Classes, Type Safety |
-| **Repository** | `features/*/data/repository/` | External communication & data transformation | API abstraction, Error handling |
-| **Provider** | `features/*/presentation/providers/` | State management & coordination | @riverpod Notifier, Sealed states |
-| **UI** | `features/*/presentation/screens/` | User interaction & presentation | ConsumerWidget, Reactive UI |
-| **Core** | `core/services/`, `core/themes/` | Shared infrastructure | API client, Design system |
-| **Shared** | `shared/widgets/`, `shared/extensions/` | Cross-feature reusables | Common widgets, Dart extensions |
+| **Entities** | `features/*/domain/entities/` | Pure business objects | Immutability, No dependencies |
+| **Repositories (Interface)** | `features/*/domain/repositories/` | Define data contracts | Abstract class, Domain-level API |
+| **Use Cases** | `features/*/domain/usecases/` | Single business actions | Business validation, Orchestration |
+| **Models** | `features/*/data/models/` | DTOs for API/DB | JSON serialization, Model-to-Entity |
+| **Data Sources** | `features/*/data/datasources/` | API/Database calls | Remote/Local data access |
+| **Repository (Impl)** | `features/*/data/repository/` | Implement domain contract | Data transformation, Caching |
+| **Providers** | `features/*/presentation/providers/` | State management | @riverpod Notifier, Sealed states |
+| **Screens** | `features/*/presentation/screens/` | Full page widgets | ConsumerWidget, Navigation |
+| **Widgets** | `features/*/presentation/widgets/` | Reusable UI components | Stateless, Data via constructor |
+| **Core Services** | `core/services/` | API client & infrastructure | Dio client, HTTP abstraction |
+| **Core Themes** | `core/themes/` | Design system | Colors, Typography, Spacing |
+| **Core Utils** | `core/utils/` | Utility functions | Formatters, Helpers |
+| **Core Constants** | `core/constants/` | App-wide constants | API URLs, Configuration |
+| **Shared Widgets** | `shared/widgets/` | Cross-feature widgets | Background effects, Common UI |
+| **Shared Extensions** | `shared/extensions/` | Dart extensions | Currency formatting |
 
 ---
 
@@ -74,7 +83,7 @@ This document provides a comprehensive technical overview of a production-ready 
 
 ### 1. Data Models Layer
 
-#### 1.1 User Model (`features/profile/data/models/user_model.dart`)
+#### 1.1 User Model (`features/profile/data/models/user_response_model.dart`)
 
 **Purpose**: Represents authenticated user data throughout the application.
 
@@ -783,28 +792,141 @@ For apps with multiple independent state domains (current structure):
 
 ```
 lib/
+├── main.dart
+├── core/
+│   ├── AGENTS.md
+│   ├── constants/
+│   │   └── api_constants.dart
+│   ├── services/
+│   │   └── api_services.dart
+│   ├── themes/
+│   │   ├── app_colors.dart
+│   │   ├── app_spacing.dart
+│   │   ├── app_theme.dart
+│   │   ├── app_typography.dart
+│   │   └── index.dart
+│   └── utils/
+│       └── currency_formatter.dart
 ├── features/
-│   ├── auth/
+│   ├── AGENTS.md
+│   ├── add_transaction/
 │   │   ├── data/
-│   │   │   ├── datasources/
-│   │   │   ├── models/
-│   │   │   └── repository/
 │   │   ├── domain/
-│   │   │   ├── entities/
-│   │   │   ├── repositories/
-│   │   │   └── usecases/
 │   │   └── presentation/
 │   │       ├── providers/
 │   │       ├── screens/
+│   │       │   └── add_transaction_screen.dart
 │   │       └── widgets/
-│   ├── expenses/
+│   │           ├── add_transaction_actions.dart
+│   │           ├── add_transaction_header.dart
+│   │           ├── amount_input_card.dart
+│   │           ├── category_selector.dart
+│   │           ├── expense_type_selector.dart
+│   │           ├── payment_method_selector.dart
+│   │           ├── success_dialog.dart
+│   │           └── title_input_card.dart
+│   ├── auth/
+│   │   ├── data/
+│   │   │   ├── datasources/
+│   │   │   │   └── auth_remote_datasource.dart
+│   │   │   ├── models/
+│   │   │   │   └── auth_response_model.dart
+│   │   │   └── repository/
+│   │   │       └── auth_repository_impl.dart
+│   │   ├── domain/
+│   │   │   ├── entities/
+│   │   │   │   └── auth_entity.dart
+│   │   │   ├── repositories/
+│   │   │   │   └── auth_repository.dart
+│   │   │   └── usecases/
+│   │   │       ├── login_usecase.dart
+│   │   │       └── logout_usecase.dart
+│   │   └── presentation/
+│   │       ├── providers/
+│   │       │   ├── auth_provider.dart
+│   │       │   └── auth_provider.g.dart
+│   │       ├── screens/
+│   │       │   └── login_screen.dart
+│   │       └── widgets/
+│   │           ├── forgot_password_link.dart
+│   │           ├── index.dart
+│   │           ├── login_button.dart
+│   │           ├── login_header.dart
+│   │           ├── login_text_field.dart
+│   │           └── sign_up_link.dart
+│   ├── base/
 │   │   ├── data/
 │   │   ├── domain/
 │   │   └── presentation/
-│   └── profile/
+│   │       ├── providers/
+│   │       ├── screens/
+│   │       │   └── base_screen.dart
+│   │       └── widgets/
+│   │           └── custom_bottom_nav.dart
+│   ├── home_dashboard/
+│   │   ├── data/
+│   │   │   ├── datasources/
+│   │   │   ├── models/
+│   │   │   │   └── expense_model.dart
+│   │   │   └── repository/
+│   │   ├── domain/
+│   │   └── presentation/
+│   │       ├── providers/
+│   │       │   ├── transaction_provider.dart
+│   │       │   └── transaction_provider.g.dart
+│   │       ├── screens/
+│   │       │   └── home_dashboard_screen.dart
+│   │       └── widgets/
+│   │           ├── filter_chips.dart
+│   │           ├── home_balance_card.dart
+│   │           ├── home_header.dart
+│   │           └── recent_transactions_list.dart
+│   ├── profile/
+│   │   ├── data/
+│   │   │   ├── datasources/
+│   │   │   │   └── profile_remote_datasource.dart
+│   │   │   ├── models/
+│   │   │   │   └── user_response_model.dart
+│   │   │   └── repository/
+│   │   │       └── profile_repository_impl.dart
+│   │   ├── domain/
+│   │   │   ├── entities/
+│   │   │   │   └── profile_entity.dart
+│   │   │   ├── repositories/
+│   │   │   │   └── profile_repository.dart
+│   │   │   └── usecases/
+│   │   │       └── get_profile_usecase.dart
+│   │   └── presentation/
+│   │       ├── providers/
+│   │       │   ├── profile_provider.dart
+│   │       │   └── profile_provider.g.dart
+│   │       ├── screens/
+│   │       │   └── profile_screen.dart
+│   │       └── widgets/
+│   │           ├── logout_button.dart
+│   │           ├── profile_avatar_info.dart
+│   │           ├── profile_header.dart
+│   │           ├── profile_menu_tile.dart
+│   │           ├── profile_section_title.dart
+│   │           └── profile_stat_card.dart
+│   └── splash_screen/
 │       ├── data/
 │       ├── domain/
 │       └── presentation/
+│           ├── providers/
+│           │   ├── splash_provider.dart
+│           │   └── splash_provider.g.dart
+│           ├── screens/
+│           │   └── splash_screen.dart
+│           └── widgets/
+│               ├── footer_content.dart
+│               └── logo_brand.dart
+└── shared/
+    ├── AGENTS.md
+    ├── extensions/
+    │   └── currency_extension.dart
+    └── widgets/
+        └── background_glows.dart
 ```
 
 Each feature has its own state management, but can access shared providers:
@@ -1036,6 +1158,7 @@ Riverpod integrates with Flutter DevTools for:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.1 | 2026-01-16 | Updated folder structure documentation to match actual project layout |
 | 1.0 | 2026-01-14 | Initial documentation |
 
 ---
@@ -1044,7 +1167,9 @@ Riverpod integrates with Flutter DevTools for:
 
 For questions or clarifications about this implementation, please refer to:
 - README.md for user-facing documentation
-- FOLDER_STRUCTURE.md for project organization
+- PRD.md for product requirements and folder structure overview
+- CLEAN_ARCHITECTURE_WORKFLOW.md for development workflow
+- DESIGN_SYSTEMS.md for theming and design tokens
 - Inline code comments for specific implementation details
 
 ---
